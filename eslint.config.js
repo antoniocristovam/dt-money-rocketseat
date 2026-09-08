@@ -113,6 +113,11 @@ export default defineConfig([
     rules: { 'react-refresh/only-export-components': 'off' },
   },
   {
+    // TanStack Router control flow: `throw redirect(...)` / `throw notFound()`.
+    files: ['src/app/routes/**/*'],
+    rules: { '@typescript-eslint/only-throw-error': 'off' },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'src/test/**/*', 'src/main.tsx'],
     rules: { 'boundaries/dependencies': 'off' },
   },
