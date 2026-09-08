@@ -1,0 +1,8 @@
+dist
+coverage
+pnpm-lock.yaml
+src/app/routes/routeTree.gen.ts
+
+# Challenge-provided docs — keep verbatim
+README.md
+cases/

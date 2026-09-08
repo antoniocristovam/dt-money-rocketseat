@@ -11,6 +11,15 @@ node_modules
 dist
 dist-ssr
 *.local
+coverage
+
+# Env
+.env
+.env.*
+!.env.example
+
+# TanStack Router generated route tree
+src/app/routes/routeTree.gen.ts
 
 # Editor directories and files
 .vscode/*
