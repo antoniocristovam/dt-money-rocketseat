@@ -1,13 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { ImageIcon, StarIcon } from 'lucide-react'
 
-import {
-  type Genre,
-  type MovieListItem,
-  genreNames,
-  posterUrl,
-} from '@/entities/movie'
+import { genreNames } from '@/_core/models/helpers/movie'
+import type { Genre, MovieListItem } from '@/_core/models/responses/movie'
 import { WatchlistToggleButton } from '@/features/watchlist'
+import { posterUrl } from '@/shared/lib/tmdb-image'
 
 interface MovieCardProps {
   movie: MovieListItem

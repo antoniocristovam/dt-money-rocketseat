@@ -1,7 +1,7 @@
 import { FilmIcon, TriangleAlertIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import type { Genre, MovieListItem } from '@/entities/movie'
+import type { Genre, MovieListItem } from '@/_core/models/responses/movie'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 

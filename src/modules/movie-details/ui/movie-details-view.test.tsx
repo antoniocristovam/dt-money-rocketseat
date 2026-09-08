@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { MovieDetails } from '@/entities/movie'
+import type { MovieDetails } from '@/_core/models/responses/movie'
 import { useWatchlistStore } from '@/features/watchlist'
 
 import { MovieDetailsView } from './movie-details-view'

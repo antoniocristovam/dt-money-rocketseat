@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 
-import { useGenresQuery } from '@/entities/movie'
+import { useGenresQuery } from '@/features/genres'
 import { Button } from '@/shared/ui/button'
 import {
   Select,

@@ -5,17 +5,18 @@ import type { ReactNode } from 'react'
 import { HttpError } from '@/shared/api/http-error'
 import { Button } from '@/shared/ui/button'
 
-import { useMovieDetailsQuery } from '../model/use-movie-details-query'
+import { useMovieDetails } from '../hooks/use-movie-details'
 import { MovieDetailsSkeleton } from '../ui/movie-details-skeleton'
 import { MovieDetailsView } from '../ui/movie-details-view'
 
+// interface
 interface MovieDetailsPageProps {
   movieId: string
 }
 
 export const MovieDetailsPage = ({ movieId }: MovieDetailsPageProps) => {
   const id = Number(movieId)
-  const query = useMovieDetailsQuery(id)
+  const query = useMovieDetails(id)
 
   const notFound =
     !Number.isFinite(id) ||

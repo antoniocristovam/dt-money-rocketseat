@@ -1,6 +1,7 @@
 import { UserRoundIcon } from 'lucide-react'
 
-import { type CastMember, posterUrl } from '@/entities/movie'
+import type { CastMember } from '@/_core/models/responses/movie'
+import { posterUrl } from '@/shared/lib/tmdb-image'
 
 export function MovieCast({ cast }: { cast: CastMember[] }) {
   if (cast.length === 0) return null
