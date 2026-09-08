@@ -1,7 +1,8 @@
 import { ImageIcon, StarIcon } from 'lucide-react'
 
-import { type MovieDetails, backdropUrl, posterUrl } from '@/entities/movie'
+import type { MovieDetails } from '@/_core/models/responses/movie'
 import { WatchlistToggleButton } from '@/features/watchlist'
+import { backdropUrl, posterUrl } from '@/shared/lib/tmdb-image'
 
 import { MovieCast } from './movie-cast'
 import { MovieTrailer } from './movie-trailer'

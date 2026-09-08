@@ -2,11 +2,10 @@ import { Link } from '@tanstack/react-router'
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { StarIcon, Trash2Icon } from 'lucide-react'
 
-import { posterUrl } from '@/entities/movie'
 import type { WatchlistMovie } from '@/features/watchlist'
+import { posterUrl } from '@/shared/lib/tmdb-image'
 import { Button } from '@/shared/ui/button'
 
-/** A watchlist row with its genre names already resolved (see WatchlistPage). */
 export type WatchlistRow = WatchlistMovie & { genre: string }
 
 const columnHelper = createColumnHelper<WatchlistRow>()
@@ -15,13 +14,11 @@ const dateFormatter = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' })
 
 function formatDate(date: string | null): string {
   if (!date) return '—'
-  // Parse as a local date (not UTC) so the day doesn't shift by timezone.
   const [year, month, day] = date.split('-').map(Number)
   if (!year || !month || !day) return '—'
   return dateFormatter.format(new Date(year, month - 1, day))
 }
 
-/** Title, genre and release date are sortable; rating and actions are not. */
 export function createWatchlistColumns(
   onRemove: (id: number) => void,
 ): ColumnDef<WatchlistRow>[] {

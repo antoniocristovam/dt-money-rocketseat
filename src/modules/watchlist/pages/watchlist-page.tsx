@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { BookmarkIcon } from 'lucide-react'
 import { useMemo } from 'react'
 
-import { useGenres } from '@/entities/movie'
+import { useGenres } from '@/features/genres'
 import { useWatchlist, useWatchlistActions } from '@/features/watchlist'
 import { Button } from '@/shared/ui/button'
 

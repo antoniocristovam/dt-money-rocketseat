@@ -13,7 +13,7 @@ vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
 
-vi.mock('@/entities/movie', () => ({ posterUrl: () => null }))
+vi.mock('@/shared/lib/tmdb-image', () => ({ posterUrl: () => null }))
 
 const rows: WatchlistRow[] = [
   {
