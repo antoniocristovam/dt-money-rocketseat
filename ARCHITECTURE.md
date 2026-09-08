@@ -40,8 +40,8 @@ src/
 ```
 src/_core/models/
   params/movie/       get-movies-params.ts · get-movie-details-params.ts
-  responses/movie/    movie-list-item.ts · movie-details.ts · paginated.ts · genre.ts
-                      get-movies-response.ts · get-movie-details-response.ts · ...
+  responses/movie/    get-genres-response.ts · get-movies-response.ts
+                      get-movie-details-response.ts   (cada um traz os tipos de domínio que retorna)
   dtos/movie/         tmdb-movie.dto.ts        (formas cruas da API TMDB)
   mappers/movie/      movie.mappers.ts         (DTO → domínio)
   helpers/movie/      genre-names.ts
