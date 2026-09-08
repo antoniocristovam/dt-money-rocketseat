@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { FilmIcon, LogOutIcon, UserIcon } from 'lucide-react'
+import { LogOutIcon, UserIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { useSession } from '@/features/auth'
@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
+import { Logo } from '@/shared/ui/logo'
 
 const linkClass =
   'text-sm text-muted-foreground transition-colors hover:text-foreground'
@@ -93,12 +94,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-6 px-4">
           <div className="flex items-center gap-6">
-            <Link
-              to="/"
-              className="flex items-center gap-2 font-semibold tracking-tight"
-            >
-              <FilmIcon className="size-5 text-primary" />
-              CineDash
+            <Link to="/" aria-label="CineDash — início" className="shrink-0">
+              <Logo className="h-6" />
             </Link>
             {isAuthenticated ? <MainNav /> : null}
           </div>

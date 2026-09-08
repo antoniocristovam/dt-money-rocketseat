@@ -1,14 +1,14 @@
 import { useNavigate } from '@tanstack/react-router'
-import { FilmIcon } from 'lucide-react'
 
 import { LoginForm } from '@/features/auth'
 import {
   Card,
-  CardTitle,
-  CardHeader,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from '@/shared/ui/card'
+import { Logo } from '@/shared/ui/logo'
 
 // interface
 interface LoginPageProps {
@@ -23,10 +23,7 @@ export const LoginPage = ({ redirectTo }: LoginPageProps) => {
     <section className="mx-auto flex min-h-[70svh] max-w-sm flex-col justify-center">
       <Card>
         <CardHeader>
-          <span className="flex items-center gap-2 font-semibold tracking-tight">
-            <FilmIcon className="size-5 text-primary" />
-            CineDash
-          </span>
+          <Logo className="mx-auto mb-3 block h-7" />
           <CardTitle>Entrar</CardTitle>
           <CardDescription>
             Acesso restrito a curadores. Use qualquer e-mail válido e uma senha
