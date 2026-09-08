@@ -2,11 +2,10 @@ import { BookmarkCheckIcon, BookmarkPlusIcon } from 'lucide-react'
 import type { MouseEvent } from 'react'
 
 import type { MovieListItem } from '@/_core/models/responses/movie'
+import { useIsInWatchlist, useWatchlistActions } from '@/features/watchlist'
 import { cn } from '@/shared/lib/cn'
 import { notify } from '@/shared/lib/notify'
 import { Button } from '@/shared/ui/button'
-
-import { useIsInWatchlist, useWatchlistActions } from '../model/use-watchlist'
 
 interface WatchlistToggleButtonProps {
   movie: MovieListItem

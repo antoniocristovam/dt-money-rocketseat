@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { useSessionStore } from '../model/session-store'
+import { useSessionStore } from '@/features/auth'
 
 import { LoginForm } from './login-form'
 

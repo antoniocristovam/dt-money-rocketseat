@@ -3,5 +3,4 @@ export interface Genre {
   name: string
 }
 
-/** `GET /genre/movie/list` */
 export type GetGenresResponse = Genre[]

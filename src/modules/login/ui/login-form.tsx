@@ -1,18 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Loader2Icon } from 'lucide-react'
 
+import { useLogin } from '@/features/auth'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 
-import { useLogin } from '../model/use-login'
-
-// interface
 interface LoginFormProps {
   onSuccess: () => void
 }
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
   // hooks
+
   const { form, submit, isSubmitting } = useLogin({ onSuccess })
   const {
     register,
@@ -27,7 +29,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           id="email"
           type="email"
           autoComplete="email"
-          placeholder="voce@exemplo.com"
+          placeholder="email@exemplo.com"
           aria-invalid={Boolean(errors.email)}
           {...register('email')}
         />

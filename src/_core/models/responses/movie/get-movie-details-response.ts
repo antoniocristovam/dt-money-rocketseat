@@ -8,13 +8,11 @@ export interface CastMember {
   profilePath: string | null
 }
 
-/** Full movie payload for the details page. Superset of {@link MovieListItem}. */
 export interface MovieDetails extends MovieListItem {
-  tagline: string | null
-  runtime: number | null
   genres: Genre[]
   cast: CastMember[]
-  /** YouTube key of the best trailer, or `null` when there is none. */
+  tagline: string | null
+  runtime: number | null
   trailerKey: string | null
 }
 

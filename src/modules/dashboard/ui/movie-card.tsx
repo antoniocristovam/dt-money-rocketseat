@@ -3,8 +3,8 @@ import { ImageIcon, StarIcon } from 'lucide-react'
 
 import { genreNames } from '@/_core/models/helpers/movie'
 import type { Genre, MovieListItem } from '@/_core/models/responses/movie'
-import { WatchlistToggleButton } from '@/features/watchlist'
 import { posterUrl } from '@/shared/lib/tmdb-image'
+import { WatchlistToggleButton } from '@/widgets/watchlist-toggle-button'
 
 interface MovieCardProps {
   movie: MovieListItem

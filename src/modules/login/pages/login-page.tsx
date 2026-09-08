@@ -1,6 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
 
-import { LoginForm } from '@/features/auth'
 import {
   Card,
   CardContent,
@@ -9,6 +8,8 @@ import {
   CardTitle,
 } from '@/shared/ui/card'
 import { Logo } from '@/shared/ui/logo'
+
+import { LoginForm } from '../ui/login-form'
 
 // interface
 interface LoginPageProps {

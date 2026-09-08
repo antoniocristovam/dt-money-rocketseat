@@ -3,7 +3,6 @@ import { LogOutIcon, UserIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { useSession } from '@/features/auth'
-import { ThemeToggle } from '@/features/theme'
 import { useWatchlistCount } from '@/features/watchlist'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
@@ -16,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
 import { Logo } from '@/shared/ui/logo'
+
+import { ThemeToggle } from './theme-toggle'
 
 const linkClass =
   'text-sm text-muted-foreground transition-colors hover:text-foreground'

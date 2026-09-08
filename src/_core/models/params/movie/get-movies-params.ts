@@ -1,8 +1,7 @@
 export interface GetMoviesParams {
   page: number
-  /** Free-text search; when present the genre/rating filters are best-effort. */
+  year?: number
   query?: string
   genreId?: number
-  year?: number
   minRating?: number
 }

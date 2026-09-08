@@ -1,5 +1,6 @@
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
 
+import { type Theme, useTheme } from '@/features/theme'
 import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,
@@ -7,9 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu'
-
-import type { Theme } from '../model/theme-store'
-import { useTheme } from '../model/use-theme'
 
 const OPTIONS: ReadonlyArray<{
   value: Theme

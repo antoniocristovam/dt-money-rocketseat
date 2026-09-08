@@ -1,4 +1,3 @@
-/** A movie as shown in listings (discovery grid, watchlist). */
 export interface MovieListItem {
   id: number
   title: string
@@ -14,7 +13,6 @@ export interface MovieListItem {
   genreIds: number[]
 }
 
-/** Generic shape of a TMDB paginated list, mapped to the domain. */
 export interface Paginated<T> {
   page: number
   totalPages: number

@@ -1,4 +1,3 @@
-export { WatchlistToggleButton } from './ui/watchlist-toggle-button'
 export {
   useWatchlist,
   useWatchlistCount,

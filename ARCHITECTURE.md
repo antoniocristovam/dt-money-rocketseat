@@ -24,16 +24,21 @@ Nenhuma alternativa fora da stack obrigatória foi usada.
 src/
   app/        # composição: providers, router, rotas, estilos globais, bootstrap
   modules/    # áreas de rota (dashboard, watchlist, movie-details, login, not-found)
-  widgets/    # blocos de UI reutilizáveis entre módulos (ex.: app-layout)
-  features/   # comportamento transversal com estado/efeito (auth, theme, watchlist, genres)
+  widgets/    # blocos de UI reutilizáveis entre módulos (app-layout, watchlist-toggle-button)
+  features/   # SÓ lógica transversal — model/ e hooks/, sem UI (auth, theme, watchlist, genres)
   services/   # 1 classe por domínio que fala com a API (movie/movie.service.ts)
   shared/     # infra agnóstica: http client, config, libs, UI kit
   _core/      # domínio puro, sem dependências: params, responses, dtos, mappers, helpers
 ```
 
-`modules/<m>/` contém `pages/`, `hooks/` (ex.: `use-movies.tsx`), `model/`
-(schemas, stores, hooks de UI) e `ui/`. `features/<f>/` e `widgets/<w>/` usam
-`model/` + `ui/` (ou `hooks/`). `index.ts` é a **public API** de cada slice.
+- **`modules/<m>/`** — a UI de rota: `pages/` (a página), `ui/` (componentes só
+  daquele módulo, ex.: `login/ui/login-form.tsx`), `hooks/` e `model/` (schemas,
+  hooks de UI).
+- **`widgets/<w>/`** — componentes de UI usados por **mais de um** módulo ou pela
+  casca do app (`app-layout`, `watchlist-toggle-button`).
+- **`features/<f>/`** — **nunca tem UI**. Só `model/` (stores Zustand, casos de uso)
+  e `hooks/`. A UI que consome uma feature vive no módulo ou num widget.
+- `index.ts` é a **public API** de cada slice.
 
 ### Camada de dados (baseada no padrão params / responses / service)
 
@@ -116,7 +121,8 @@ Como não há backend, a sessão é 100% client-side:
 - **`model/use-login.ts`** — orquestra o formulário: RHF + `zodResolver`, simula
   latência de rede, chama `signIn`, dispara um toast e delega a navegação via
   callback `onSuccess` (a feature não conhece rotas).
-- **`ui/login-form.tsx`** — apresentação pura (Input/Label/Button do `shared/ui`).
+- A UI vive no módulo: **`modules/login/ui/login-form.tsx`** (Input/Label/Button do
+  `shared/ui`), composta por `modules/login/pages/login-page.tsx`.
 
 ### Guard de rotas
 
@@ -140,14 +146,15 @@ O `logout` fica no `UserMenu` do `app-layout` (widget → feature): `signOut()` 
 
 ## Tema Dark/Light
 
-`features/theme`:
+`features/theme/model`:
 
 - `theme-store.ts` — Zustand + `persist` (`cinedash:theme`), valores `light | dark | system`.
 - `use-theme.ts` — combina a escolha persistida com a preferência do SO
   (`matchMedia`, reativo via `useSyncExternalStore`).
 - `use-apply-theme.ts` — efeito único perto da raiz que aplica a classe `.dark`
   no `<html>`. Montado em `app/providers/app-providers.tsx`.
-- `ui/theme-toggle.tsx` — dropdown (shadcn) no header.
+
+O dropdown fica em `widgets/app-layout/ui/theme-toggle.tsx` (só o header usa).
 
 ## Dashboard de descoberta (`modules/dashboard`)
 
@@ -192,15 +199,15 @@ useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
   mostra spinner e fica `disabled` enquanto `useGenresQuery` carrega.
 - **Estados** — `MovieGrid` cobre loading (skeletons), erro (com retry) e vazio.
 
-## Watchlist (`features/watchlist` + `modules/watchlist`)
+## Watchlist (`features/watchlist` + `widgets/watchlist-toggle-button` + `modules/watchlist`)
 
 - **`features/watchlist/model/watchlist-store.ts`** — Zustand + `persist`
   (`cinedash:watchlist`). Guarda um **snapshot enxuto** de cada filme
   (`toWatchlistMovie`) para a tabela funcionar offline. `toggle` devolve o
   estado resultante (para o toast). `add` deduplica por id.
-- **`features/watchlist/ui/watchlist-toggle-button.tsx`** — usado no card do
-  dashboard (variante `icon`, com `preventDefault` porque o card é um `<Link>`)
-  e depois na página de detalhes.
+- **`widgets/watchlist-toggle-button/`** — o botão de marcador. É um widget
+  porque o dashboard (card, variante `icon` com `preventDefault` — o card é um
+  `<Link>`) e os detalhes do filme consomem o mesmo componente.
 - **`modules/watchlist`** — a `WatchlistPage` resolve os nomes de gênero
   (`useGenres`) e passa as linhas já prontas para `WatchlistTable`; a tabela
   não faz data-fetching. **TanStack Table** (`@tanstack/react-table` v8):
