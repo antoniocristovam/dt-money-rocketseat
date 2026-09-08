@@ -10,11 +10,14 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 /**
- * Feature-Sliced Design layers, from most to least app-specific. A layer may
- * only import from layers below it, and slices on the same layer may not import
- * each other. Enforced by `boundaries/dependencies`.
+ * Architectural layers, from most to least app-specific. A layer may only import
+ * from layers below it, and slices on the same layer may not import each other.
+ * Enforced by `boundaries/dependencies`.
+ *
+ * `modules/*` = route-level feature areas (dashboard, movie-details…), composed
+ * of `features`, `entities`, `widgets` and `shared`.
  */
-const LAYERS = ['app', 'pages', 'widgets', 'features', 'entities', 'shared']
+const LAYERS = ['app', 'modules', 'widgets', 'features', 'entities', 'shared']
 
 const fsdPolicies = LAYERS.map((layer, index) => ({
   from: { element: { type: layer } },
@@ -56,7 +59,7 @@ export default defineConfig([
     settings: {
       'boundaries/elements': [
         { type: 'app', pattern: 'src/app/*' },
-        { type: 'pages', pattern: 'src/pages/*' },
+        { type: 'modules', pattern: 'src/modules/*' },
         { type: 'widgets', pattern: 'src/widgets/*' },
         { type: 'features', pattern: 'src/features/*' },
         { type: 'entities', pattern: 'src/entities/*' },
@@ -83,6 +86,14 @@ export default defineConfig([
       '@typescript-eslint/no-misused-promises': [
         'error',
         { checksVoidReturn: { attributes: false } },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
       'import-x/order': [
         'error',
@@ -119,7 +130,12 @@ export default defineConfig([
   },
   {
     files: ['**/*.test.{ts,tsx}', 'src/test/**/*', 'src/main.tsx'],
-    rules: { 'boundaries/dependencies': 'off' },
+    rules: {
+      'boundaries/dependencies': 'off',
+      // Vitest matchers (`expect.objectContaining`, mock helpers) are loosely typed.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+    },
   },
   {
     files: ['*.{ts,js}'],

@@ -1,13 +1,13 @@
+/**
+ * Central registry of TanStack Query cache keys. One typed factory keeps
+ * `useQuery` calls and `invalidateQueries` in sync.
+ */
 export const queryKeys = {
   movies: {
     all: ['movies'] as const,
-    trending: (page: number) =>
-      [...queryKeys.movies.all, 'trending', page] as const,
-    popular: (page: number) =>
-      [...queryKeys.movies.all, 'popular', page] as const,
+    list: (filters: Record<string, unknown>) =>
+      [...queryKeys.movies.all, 'list', filters] as const,
     detail: (id: number) => [...queryKeys.movies.all, 'detail', id] as const,
-    search: (term: string, page: number) =>
-      [...queryKeys.movies.all, 'search', term, page] as const,
   },
   genres: {
     all: ['genres'] as const,

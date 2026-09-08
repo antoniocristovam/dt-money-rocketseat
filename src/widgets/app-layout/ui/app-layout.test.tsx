@@ -1,18 +1,22 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useSessionStore } from '@/features/auth'
+import { useWatchlistStore } from '@/features/watchlist'
 
 import { AppLayout } from './app-layout'
 
 const navigate = vi.fn()
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigate,
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
 
 afterEach(() => {
   useSessionStore.setState({ token: null, user: null })
+  useWatchlistStore.setState({ items: [] })
 })
 
 describe('AppLayout', () => {
