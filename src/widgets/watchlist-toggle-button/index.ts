@@ -1,1 +1,1 @@
-export { WatchlistToggleButton } from './ui/watchlist-toggle-button'
+export { WatchlistToggleButton } from './components/watchlist-toggle-button'

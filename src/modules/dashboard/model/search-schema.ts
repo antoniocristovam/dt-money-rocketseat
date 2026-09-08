@@ -2,10 +2,6 @@ import { z } from 'zod'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
-/**
- * URL search params for the discovery dashboard. Every field is optional and
- * `.catch()`-guarded so a hand-edited URL never throws — it falls back instead.
- */
 export const dashboardSearchSchema = z.object({
   page: z.number().int().min(1).max(500).catch(1).default(1),
   q: z.string().trim().min(1).optional().catch(undefined),

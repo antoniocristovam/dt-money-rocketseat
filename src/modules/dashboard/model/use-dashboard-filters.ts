@@ -7,10 +7,6 @@ const routeApi = getRouteApi('/_authenticated/')
 
 export type FilterPatch = Partial<DashboardSearch>
 
-/**
- * Reads the discovery filters from the URL and writes them back. Any change
- * except an explicit `page` resets pagination to page 1.
- */
 export function useDashboardFilters() {
   const filters = routeApi.useSearch()
   const navigate = routeApi.useNavigate()
@@ -39,8 +35,8 @@ export function useDashboardFilters() {
       search: {
         page: 1,
         q: undefined,
-        genre: undefined,
         year: undefined,
+        genre: undefined,
         minRating: undefined,
       },
     })

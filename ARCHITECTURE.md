@@ -31,8 +31,8 @@ src/
   _core/      # domínio puro, sem dependências: params, responses, dtos, mappers, helpers
 ```
 
-- **`modules/<m>/`** — a UI de rota: `pages/` (a página), `ui/` (componentes só
-  daquele módulo, ex.: `login/ui/login-form.tsx`), `hooks/` e `model/` (schemas,
+- **`modules/<m>/`** — a UI de rota: `pages/` (a página), `components/` (componentes só
+  daquele módulo, ex.: `login/components/login-form.tsx`), `hooks/` e `model/` (schemas,
   hooks de UI).
 - **`widgets/<w>/`** — componentes de UI usados por **mais de um** módulo ou pela
   casca do app (`app-layout`, `watchlist-toggle-button`).
@@ -100,7 +100,7 @@ mora em `features/auth`; `_authenticated/route.tsx` só a consome no `beforeLoad
 
 ### Separação UI / Lógica / Dados
 
-- **UI** (`ui/`): recebe dados por props, dispara callbacks. Sem `fetch`, sem store.
+- **UI** (`components/`): recebe dados por props, dispara callbacks. Sem `fetch`, sem store.
 - **Lógica** (`model/` + `hooks/`): hooks e stores — debounce, seleção de tema,
   filtros da URL, e os hooks de dados (`use-movies`, `use-movie-details`, `use-genres`).
 - **Dados**: `shared/api/http-client.ts` (fetch tipado) → `services/movie` (casos
@@ -121,7 +121,7 @@ Como não há backend, a sessão é 100% client-side:
 - **`model/use-login.ts`** — orquestra o formulário: RHF + `zodResolver`, simula
   latência de rede, chama `signIn`, dispara um toast e delega a navegação via
   callback `onSuccess` (a feature não conhece rotas).
-- A UI vive no módulo: **`modules/login/ui/login-form.tsx`** (Input/Label/Button do
+- A UI vive no módulo: **`modules/login/components/login-form.tsx`** (Input/Label/Button do
   `shared/ui`), composta por `modules/login/pages/login-page.tsx`.
 
 ### Guard de rotas
@@ -154,7 +154,7 @@ O `logout` fica no `UserMenu` do `app-layout` (widget → feature): `signOut()` 
 - `use-apply-theme.ts` — efeito único perto da raiz que aplica a classe `.dark`
   no `<html>`. Montado em `app/providers/app-providers.tsx`.
 
-O dropdown fica em `widgets/app-layout/ui/theme-toggle.tsx` (só o header usa).
+O dropdown fica em `widgets/app-layout/components/theme-toggle.tsx` (só o header usa).
 
 ## Dashboard de descoberta (`modules/dashboard`)
 

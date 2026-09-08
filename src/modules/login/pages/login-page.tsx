@@ -9,7 +9,7 @@ import {
 } from '@/shared/ui/card'
 import { Logo } from '@/shared/ui/logo'
 
-import { LoginForm } from '../ui/login-form'
+import { LoginForm } from '../components/login-form'
 
 // interface
 interface LoginPageProps {

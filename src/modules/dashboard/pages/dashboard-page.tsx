@@ -7,13 +7,13 @@ import { movieService } from '@/services/movie'
 import { queryKeys } from '@/shared/api/query-keys'
 import { cn } from '@/shared/lib/cn'
 
+import { DashboardPagination } from '../components/dashboard-pagination'
+import { MovieFilters } from '../components/movie-filters'
+import { MovieGrid } from '../components/movie-grid'
+import { SearchInput } from '../components/search-input'
 import { useMovies } from '../hooks/use-movies'
 import type { DashboardSearch } from '../model/search-schema'
 import { useDashboardFilters } from '../model/use-dashboard-filters'
-import { DashboardPagination } from '../ui/dashboard-pagination'
-import { MovieFilters } from '../ui/movie-filters'
-import { MovieGrid } from '../ui/movie-grid'
-import { SearchInput } from '../ui/search-input'
 
 function toMoviesParams(filters: DashboardSearch): GetMoviesParams {
   return {

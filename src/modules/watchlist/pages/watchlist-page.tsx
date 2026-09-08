@@ -6,8 +6,8 @@ import { useGenres } from '@/features/genres'
 import { useWatchlist, useWatchlistActions } from '@/features/watchlist'
 import { Button } from '@/shared/ui/button'
 
+import { WatchlistTable } from '../components/watchlist-table'
 import type { WatchlistRow } from '../model/watchlist-columns'
-import { WatchlistTable } from '../ui/watchlist-table'
 
 export const WatchlistPage = () => {
   const movies = useWatchlist()

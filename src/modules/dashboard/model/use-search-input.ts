@@ -2,11 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
 
-/**
- * Two-way binds a text input to the URL `q` param with a debounce on the write
- * side. A ref tracks the last value we pushed so external URL changes (back
- * button, "clear filters") flow back into the input without an echo loop.
- */
 export function useSearchInput(
   urlQuery: string | undefined,
   onCommit: (query: string | undefined) => void,

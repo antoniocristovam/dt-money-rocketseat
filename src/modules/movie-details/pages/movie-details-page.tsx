@@ -5,9 +5,9 @@ import type { ReactNode } from 'react'
 import { HttpError } from '@/shared/api/http-error'
 import { Button } from '@/shared/ui/button'
 
+import { MovieDetailsSkeleton } from '../components/movie-details-skeleton'
+import { MovieDetailsView } from '../components/movie-details-view'
 import { useMovieDetails } from '../hooks/use-movie-details'
-import { MovieDetailsSkeleton } from '../ui/movie-details-skeleton'
-import { MovieDetailsView } from '../ui/movie-details-view'
 
 // interface
 interface MovieDetailsPageProps {

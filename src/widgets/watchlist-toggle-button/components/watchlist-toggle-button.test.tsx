@@ -3,8 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { MovieListItem } from '@/_core/models/responses/movie'
-
-import { useWatchlistStore } from '../model/watchlist-store'
+import { useWatchlistStore } from '@/features/watchlist'
 
 import { WatchlistToggleButton } from './watchlist-toggle-button'
 
