@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import type { MovieListItem } from '@/entities/movie'
+import type { MovieListItem } from '@/_core/models/responses/movie'
 
 import { useWatchlistStore } from './watchlist-store'
 

@@ -1,25 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
+import { genreNames } from '@/_core/models/helpers/movie'
+import { movieService } from '@/services/movie'
 import { queryKeys } from '@/shared/api/query-keys'
 
-import { fetchMovieGenres } from '../api/genres-service'
-
-import { genreNames } from './genres'
-import type { Genre } from './types'
-
+/** Raw query for the TMDB genre list. Effectively static, so it never goes stale. */
 export function useGenresQuery() {
+  const requestGenres = useCallback(() => movieService.getGenres(), [])
+
   return useQuery({
     queryKey: queryKeys.genres.list(),
-    queryFn: fetchMovieGenres,
-    // The genre list is effectively static.
+    queryFn: requestGenres,
     staleTime: Infinity,
   })
 }
 
 /**
- * Convenience hook returning the genre list plus a `resolve` helper that turns
- * genre ids into a display string ("Ação, Aventura").
+ * The genre list plus a `resolve` helper that turns genre ids into a display
+ * string ("Ação, Aventura"). Consumed by the dashboard filters and the watchlist
+ * table.
  */
 export function useGenres() {
   const { data: genres = [] } = useGenresQuery()
@@ -32,5 +32,3 @@ export function useGenres() {
 
   return { genres, resolve }
 }
-
-export type { Genre }

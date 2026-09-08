@@ -1,19 +1,21 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
 
-import { type MovieQuery, fetchMovies, useGenresQuery } from '@/entities/movie'
+import type { GetMoviesParams } from '@/_core/models/params/movie'
+import { useGenresQuery } from '@/features/genres'
+import { movieService } from '@/services/movie'
 import { queryKeys } from '@/shared/api/query-keys'
 import { cn } from '@/shared/lib/cn'
 
+import { useMovies } from '../hooks/use-movies'
 import type { DashboardSearch } from '../model/search-schema'
 import { useDashboardFilters } from '../model/use-dashboard-filters'
-import { useMoviesQuery } from '../model/use-movies-query'
 import { DashboardPagination } from '../ui/dashboard-pagination'
 import { MovieFilters } from '../ui/movie-filters'
 import { MovieGrid } from '../ui/movie-grid'
 import { SearchInput } from '../ui/search-input'
 
-function toMovieQuery(filters: DashboardSearch): MovieQuery {
+function toMoviesParams(filters: DashboardSearch): GetMoviesParams {
   return {
     page: filters.page,
     query: filters.q,
@@ -26,26 +28,24 @@ function toMovieQuery(filters: DashboardSearch): MovieQuery {
 export const DashboardPage = () => {
   const queryClient = useQueryClient()
   const { filters } = useDashboardFilters()
-  const query = useMemo(() => toMovieQuery(filters), [filters])
+  const params = useMemo(() => toMoviesParams(filters), [filters])
 
-  const moviesQuery = useMoviesQuery(query)
+  const moviesQuery = useMovies(params)
   const genresQuery = useGenresQuery()
 
   const page = moviesQuery.data
   const totalPages = page?.totalPages ?? 0
-  // Background refetch (filters/search/page changed) while old results stay on screen.
   const isRefetching = moviesQuery.isFetching && !moviesQuery.isLoading
 
-  // Prefetch the next page so forward pagination feels instant.
   useEffect(() => {
-    if (!page || query.page >= totalPages) return
-    const nextParams = { ...query, page: query.page + 1 }
+    if (!page || params.page >= totalPages) return
+    const nextParams = { ...params, page: params.page + 1 }
     void queryClient.prefetchQuery({
       queryKey: queryKeys.movies.list(nextParams),
-      queryFn: () => fetchMovies(nextParams),
+      queryFn: () => movieService.getMovies(nextParams),
       staleTime: 60_000,
     })
-  }, [page, totalPages, query, queryClient])
+  }, [page, totalPages, params, queryClient])
 
   return (
     <section className="space-y-6">
@@ -75,9 +75,9 @@ export const DashboardPage = () => {
       >
         <MovieGrid
           movies={page?.results ?? []}
+          isError={moviesQuery.isError}
           genres={genresQuery.data ?? []}
           isLoading={moviesQuery.isLoading}
-          isError={moviesQuery.isError}
           onRetry={() => void moviesQuery.refetch()}
         />
       </div>

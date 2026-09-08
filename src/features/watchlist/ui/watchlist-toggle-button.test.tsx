@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { MovieListItem } from '@/entities/movie'
+import type { MovieListItem } from '@/_core/models/responses/movie'
 
 import { useWatchlistStore } from '../model/watchlist-store'
 

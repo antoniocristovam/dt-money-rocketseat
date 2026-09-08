@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { MovieListItem } from '@/entities/movie'
+import type { MovieListItem } from '@/_core/models/responses/movie'
 
 /** The snapshot we keep for a saved movie — enough to render the table offline. */
 export interface WatchlistMovie {

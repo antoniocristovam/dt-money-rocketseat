@@ -2,7 +2,7 @@ import { BookmarkCheckIcon, BookmarkPlusIcon } from 'lucide-react'
 import type { MouseEvent } from 'react'
 import { toast } from 'sonner'
 
-import type { MovieListItem } from '@/entities/movie'
+import type { MovieListItem } from '@/_core/models/responses/movie'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/button'
 
