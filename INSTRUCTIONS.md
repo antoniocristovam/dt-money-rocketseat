@@ -68,6 +68,15 @@ Não há backend de autenticação. Na tela de login use **qualquer e-mail váli
 A sessão é persistida no `localStorage` e sobrevive ao reload; use o menu do
 usuário no header para sair.
 
+## Funcionalidades
+
+- **Descoberta** (`/`) — grid de filmes do TMDB, busca com debounce, filtros de
+  gênero/ano/nota mínima e paginação — tudo refletido na URL (compartilhável).
+- **Minha lista** (`/watchlist`) — adicione filmes pelo marcador nos cards ou na
+  página de detalhes; tabela ordenável (TanStack Table); persiste no `localStorage`.
+- **Detalhes** (`/movie/:id`) — sinopse, elenco, trailer e toggle na watchlist.
+- **Tema** claro/escuro/sistema, persistido.
+
 ## Estrutura e decisões
 
 Veja [`ARCHITECTURE.md`](./ARCHITECTURE.md).

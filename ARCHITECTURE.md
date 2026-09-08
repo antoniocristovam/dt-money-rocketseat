@@ -25,31 +25,50 @@ src/
   app/        # composição: providers, router, rotas, estilos globais, bootstrap
   modules/    # áreas de rota (dashboard, watchlist, movie-details, login, not-found)
   widgets/    # blocos de UI reutilizáveis entre módulos (ex.: app-layout)
-  features/   # comportamento transversal com estado/efeito (auth, theme, watchlist)
-  entities/   # domínio compartilhado (movie: tipos, mappers DTO→domínio, services + hooks TMDB)
-  shared/     # base agnóstica de domínio: http client, config, libs, componentes de UI
+  features/   # comportamento transversal com estado/efeito (auth, theme, watchlist, genres)
+  services/   # 1 classe por domínio que fala com a API (movie/movie.service.ts)
+  shared/     # infra agnóstica: http client, config, libs, UI kit
+  _core/      # domínio puro, sem dependências: params, responses, dtos, mappers, helpers
 ```
 
-Dentro de cada slice de `modules/*`, `features/*`, `widgets/*` e `entities/*` as
-**camadas Clean**:
+`modules/<m>/` contém `pages/`, `hooks/` (ex.: `use-movies.tsx`), `model/`
+(schemas, stores, hooks de UI) e `ui/`. `features/<f>/` e `widgets/<w>/` usam
+`model/` + `ui/` (ou `hooks/`). `index.ts` é a **public API** de cada slice.
 
-| Pasta      | Responsabilidade                                        | Pode depender de            |
-| ---------- | ------------------------------------------------------- | --------------------------- |
-| `pages/`   | (só em `modules/`) compõe ui + model da rota            | tudo abaixo                 |
-| `model/`   | regra de negócio: stores, hooks, schemas, casos de uso  | `api`, `entities`, `shared` |
-| `api/`     | acesso a dados: services + mappers sobre o `httpClient` | `entities`, `shared`        |
-| `ui/`      | apresentação: componentes React "burros"                | `model`, `ui`, `shared`     |
-| `index.ts` | **public API** do slice — único ponto de import externo | —                           |
+### Camada de dados (baseada no padrão params / responses / service)
+
+```
+src/_core/models/
+  params/movie/       get-movies-params.ts · get-movie-details-params.ts
+  responses/movie/    movie-list-item.ts · movie-details.ts · paginated.ts · genre.ts
+                      get-movies-response.ts · get-movie-details-response.ts · ...
+  dtos/movie/         tmdb-movie.dto.ts        (formas cruas da API TMDB)
+  mappers/movie/      movie.mappers.ts         (DTO → domínio)
+  helpers/movie/      genre-names.ts
+src/services/movie/
+  movie.service.interface.ts   IMovieService — o contrato dos casos de uso
+  movie.service.ts             class MovieService implements IMovieService + singleton `movieService`
+```
+
+- **Params/Responses** (`_core/models`) — um arquivo por tipo, barris `index.ts` em
+  cada nível. O caller só lida com shapes de domínio, nunca com DTO `snake_case`.
+- **Service** (`services/movie`) — cada método (`getMovies`, `getMovieDetails`,
+  `getGenres`) recebe `params` tipado, faz a request via `httpClient` e mapeia
+  DTO→domínio. Não engole erro: o `HttpError` propaga para o TanStack Query.
+  Instância única exportada (`movieService`) — DI leve, sem provider.
+- **Hooks** — `modules/<m>/hooks/use-*.tsx` (e `features/genres/hooks/use-genres.tsx`).
+  Cada hook é um `useQuery` cuja `queryFn` é uma `request*` memoizada que chama
+  `movieService.*`.
 
 ### Regra de dependência (imposta por lint)
 
-`app → modules → widgets → features → entities → shared`
+`app → modules → widgets → features → services → shared → _core`
 
 Uma camada só importa de camadas **abaixo** dela, e slices do mesmo nível **não**
-se importam (ex.: uma feature não importa outra feature). Isso é verificado pelo
-`eslint-plugin-boundaries` em `eslint.config.js` — violar a regra quebra o
-`pnpm lint`. O import via alias `@/` também é resolvido pelo TypeScript resolver
-na regra, então mover arquivos não silencia a checagem.
+se importam (ex.: uma feature não importa outra feature). `_core` é folha pura —
+não importa nada. Verificado pelo `eslint-plugin-boundaries` em `eslint.config.js`;
+violar quebra o `pnpm lint`. O alias `@/` é resolvido pelo resolver TypeScript na
+regra, então mover arquivos não silencia a checagem.
 
 ### Rotas (`src/app/routes`)
 
@@ -77,12 +96,11 @@ mora em `features/auth`; `_authenticated/route.tsx` só a consome no `beforeLoad
 ### Separação UI / Lógica / Dados
 
 - **UI** (`ui/`): recebe dados por props, dispara callbacks. Sem `fetch`, sem store.
-- **Lógica** (`model/`): hooks e stores. É onde vivem debounce, seleção de tema,
-  regras de watchlist etc.
-- **Dados** (`api/` + `shared/api`): todo acesso HTTP passa por
-  `shared/api/http-client.ts` (injeta auth do TMDB, monta query string, normaliza
-  erro em `HttpError`). As chaves de cache do TanStack Query ficam centralizadas
-  em `shared/api/query-keys.ts`.
+- **Lógica** (`model/` + `hooks/`): hooks e stores — debounce, seleção de tema,
+  filtros da URL, e os hooks de dados (`use-movies`, `use-movie-details`, `use-genres`).
+- **Dados**: `shared/api/http-client.ts` (fetch tipado) → `services/movie` (casos
+  de uso) → `_core/models` (params/responses/dtos/mappers). Ver a seção "Camada de
+  dados" acima. As chaves de cache do TanStack Query ficam em `shared/api/query-keys.ts`.
 
 ## Autenticação sem backend (`features/auth`)
 
@@ -131,7 +149,7 @@ O `logout` fica no `UserMenu` do `app-layout` (widget → feature): `signOut()` 
   no `<html>`. Montado em `app/providers/app-providers.tsx`.
 - `ui/theme-toggle.tsx` — dropdown (shadcn) no header.
 
-## Dashboard de descoberta (`entities/movie` + `modules/dashboard`)
+## Dashboard de descoberta (`modules/dashboard`)
 
 **Fonte de verdade = a URL.** O estado de busca/filtros/página vive nos search
 params, validados por Zod em `_authenticated/index.tsx` (`dashboardSearchSchema`,
@@ -143,24 +161,24 @@ Fluxo de dados:
 
 ```
 URL search params ──(useDashboardFilters)──▶ DashboardPage
-   │                                              │ toMovieQuery()
+   │                                              │ toMoviesParams()
    │                                              ▼
-   │                                       useMoviesQuery ──▶ entities/movie.fetchMovies
+   │                     useMovies(params) ──▶ movieService.getMovies(params)
    ▼                                                              │
 useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
                                                     /discover/movie  ou  /search/movie
 ```
 
-- **`entities/movie/api/`** — `movies-service.ts` decide entre `/discover/movie`
-  (filtros nativos: `with_genres`, `primary_release_year`, `vote_average.gte`) e
-  `/search/movie` (quando há texto; gênero/nota aplicados client-side, pois a
-  busca do TMDB os ignora). `movie-mappers.ts` converte o DTO `snake_case` para o
-  domínio e limita `totalPages` a 500 (teto do TMDB).
-- **`model/use-movies-query.ts`** — `useQuery` com `placeholderData: keepPreviousData`
-  (paginação sem flash) e `staleTime` de 1 min.
-- **`entities/movie/model/use-genres-query.ts`** — lista de gêneros
-  (`staleTime: Infinity`) + `useGenres()` com `resolve(ids)`; fica no entity
-  porque dashboard e watchlist consomem.
+- **`movieService.getMovies`** decide entre `/discover/movie` (filtros nativos:
+  `with_genres`, `primary_release_year`, `vote_average.gte`) e `/search/movie`
+  (quando há texto; gênero/nota aplicados client-side, pois a busca do TMDB os
+  ignora). `_core/models/mappers/movie` converte o DTO `snake_case` para o domínio
+  e limita `totalPages` a 500 (teto do TMDB).
+- **`modules/dashboard/hooks/use-movies.tsx`** — `useQuery` com
+  `placeholderData: keepPreviousData` (paginação sem flash) e `staleTime` de 1 min.
+- **`features/genres/hooks/use-genres.tsx`** — lista de gêneros
+  (`staleTime: Infinity`) + `useGenres()` com `resolve(ids)`; é uma feature porque
+  dashboard e watchlist consomem.
 - **Debounce** — `shared/lib/use-debounced-value` (sobre o util `debounce`);
   `useSearchInput` faz o bind bidirecional input↔URL sem loop de eco (ref guarda
   o último valor propagado) e expõe `isDebouncing`.
@@ -192,12 +210,11 @@ useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
 
 ## Detalhes do filme (`modules/movie-details`)
 
-- **`entities/movie/api/movie-details-service.ts`** — `fetchMovieDetails(id)` faz
-  uma única chamada `/movie/{id}?append_to_response=credits,videos`;
-  `mapMovieDetails` normaliza (deriva `genreIds` dos `genres`, corta o elenco em
-  12, e `pickTrailerKey` escolhe o melhor trailer do YouTube — oficial > qualquer
-  Trailer > primeiro vídeo).
-- **`model/use-movie-details-query.ts`** — `useQuery` chaveado por
+- **`movieService.getMovieDetails({ id })`** — uma única chamada
+  `/movie/{id}?append_to_response=credits,videos`; `mapMovieDetails` normaliza
+  (deriva `genreIds` dos `genres`, corta o elenco em 12, e `pickTrailerKey`
+  escolhe o melhor trailer do YouTube — oficial > qualquer Trailer > primeiro vídeo).
+- **`modules/movie-details/hooks/use-movie-details.tsx`** — `useQuery` chaveado por
   `queryKeys.movies.detail(id)`, `enabled` só para id válido, **sem retry em 404**
   (id errado não adianta repetir).
 - **`pages/movie-details-page.tsx`** — trata id inválido / 404 ("Filme não

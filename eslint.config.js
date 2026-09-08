@@ -14,28 +14,34 @@ import tseslint from 'typescript-eslint'
  * from layers below it, and slices on the same layer may not import each other.
  * Enforced by `boundaries/dependencies`.
  *
- * `modules/*` = route-level feature areas (dashboard, movie-details…), composed
- * of `features`, `entities`, `widgets` and `shared`.
+ * - `modules/*` — route-level feature areas (dashboard, movie-details, watchlist…)
+ * - `features/*` — cross-cutting behaviour with state/effects (auth, theme, genres…)
+ * - `services/*` — one class per domain that talks to the API (`movieService`)
+ * - `_core/*` — pure domain models: params, responses, DTOs, mappers
+ * - `shared/*` — framework-agnostic infra: http client, UI kit, libs
  */
-const LAYERS = ['app', 'modules', 'widgets', 'features', 'entities', 'shared']
+const LAYERS = [
+  'app',
+  'modules',
+  'widgets',
+  'features',
+  'services',
+  'shared',
+  '_core',
+]
 
 const fsdPolicies = LAYERS.map((layer, index) => ({
   from: { element: { type: layer } },
   allow: { to: { element: { types: { anyOf: LAYERS.slice(index + 1) } } } },
 })).filter((policy) => policy.allow.to.element.types.anyOf.length > 0)
 
-// The `app` and `shared` layers are single conceptual slices: their own files
-// may import each other freely.
-fsdPolicies.push(
-  {
-    from: { element: { type: 'app' } },
-    allow: { to: { element: { type: 'app' } } },
-  },
-  {
-    from: { element: { type: 'shared' } },
-    allow: { to: { element: { type: 'shared' } } },
-  },
-)
+// These layers are single conceptual slices: their own files may import each other.
+for (const layer of ['app', 'services', 'shared', '_core']) {
+  fsdPolicies.push({
+    from: { element: { type: layer } },
+    allow: { to: { element: { type: layer } } },
+  })
+}
 
 export default defineConfig([
   globalIgnores(['dist', 'coverage', 'src/app/routes/routeTree.gen.ts']),
@@ -62,8 +68,9 @@ export default defineConfig([
         { type: 'modules', pattern: 'src/modules/*' },
         { type: 'widgets', pattern: 'src/widgets/*' },
         { type: 'features', pattern: 'src/features/*' },
-        { type: 'entities', pattern: 'src/entities/*' },
+        { type: 'services', pattern: 'src/services/*' },
         { type: 'shared', pattern: 'src/shared/*' },
+        { type: '_core', pattern: 'src/_core/*' },
       ],
       // `import-x/resolver` is read by import-x; `import/resolver` by boundaries.
       'import-x/resolver': {
