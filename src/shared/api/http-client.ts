@@ -5,9 +5,7 @@ import { HttpError } from './http-error'
 type QueryValue = string | number | boolean | null | undefined
 
 export interface HttpRequestOptions extends Omit<RequestInit, 'body'> {
-  /** Query params appended to the URL; nullish values are skipped. */
   params?: Record<string, QueryValue>
-  /** JSON body — serialized automatically. */
   body?: unknown
 }
 
@@ -26,11 +24,6 @@ function buildUrl(path: string, params?: Record<string, QueryValue>): string {
   return url.toString()
 }
 
-/**
- * Typed `fetch` wrapper for the TMDB API. Injects auth + JSON headers, builds
- * query strings, and normalizes failures into {@link HttpError}. All data
- * access (services) should go through this rather than calling `fetch` directly.
- */
 export async function httpClient<T>(
   path: string,
   { params, body, headers, ...init }: HttpRequestOptions = {},
