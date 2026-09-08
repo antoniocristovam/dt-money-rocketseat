@@ -1,0 +1,66 @@
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import type { MovieDetails } from '@/entities/movie'
+import { useWatchlistStore } from '@/features/watchlist'
+
+import { MovieDetailsView } from './movie-details-view'
+
+vi.mock('sonner', () => ({ toast: { success: vi.fn() } }))
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
+}))
+
+const movie: MovieDetails = {
+  id: 693134,
+  title: 'Dune: Part Two',
+  overview: 'Paul Atreides se une aos Fremen.',
+  posterPath: null,
+  backdropPath: null,
+  releaseDate: '2024-02-27',
+  year: 2024,
+  rating: 8.1,
+  voteCount: 5000,
+  genreIds: [878, 12],
+  genres: [
+    { id: 878, name: 'Ficção Científica' },
+    { id: 12, name: 'Aventura' },
+  ],
+  tagline: 'Longa vida aos combatentes.',
+  runtime: 167,
+  cast: [
+    { id: 1, name: 'Timothée Chalamet', character: 'Paul', profilePath: null },
+  ],
+  trailerKey: 'Way9Dexny3w',
+}
+
+afterEach(() => {
+  useWatchlistStore.setState({ items: [] })
+})
+
+describe('MovieDetailsView', () => {
+  it('renders synopsis, meta, cast and trailer', () => {
+    render(<MovieDetailsView movie={movie} />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Dune: Part Two' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/paul atreides se une/i)).toBeInTheDocument()
+    expect(screen.getByText('2h 47min')).toBeInTheDocument()
+    expect(screen.getByText('Timothée Chalamet')).toBeInTheDocument()
+    expect(screen.getByTitle('Trailer de Dune: Part Two')).toHaveAttribute(
+      'src',
+      expect.stringContaining('Way9Dexny3w'),
+    )
+  })
+
+  it('toggles the movie in the watchlist', async () => {
+    const user = userEvent.setup()
+    render(<MovieDetailsView movie={movie} />)
+
+    await user.click(screen.getByRole('button', { name: /adicionar à lista/i }))
+    expect(useWatchlistStore.getState().items[0]?.id).toBe(693134)
+  })
+})

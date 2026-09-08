@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { mapMovieListItem, mapPaginated } from './movie-mappers'
-import type { TmdbMovieDto } from './tmdb-dto'
+import {
+  mapMovieDetails,
+  mapMovieListItem,
+  mapPaginated,
+} from './movie-mappers'
+import type { TmdbMovieDetailsDto, TmdbMovieDto } from './tmdb-dto'
 
 const dto: TmdbMovieDto = {
   id: 1,
@@ -54,5 +58,66 @@ describe('mapPaginated', () => {
     expect(mapped.totalPages).toBe(500)
     expect(mapped.results).toHaveLength(1)
     expect(mapped.results[0]?.title).toBe('Duna')
+  })
+})
+
+const detailsDto: TmdbMovieDetailsDto = {
+  ...dto,
+  genre_ids: undefined,
+  tagline: 'A guerra pela especiaria.',
+  runtime: 155,
+  genres: [
+    { id: 878, name: 'Ficção Científica' },
+    { id: 12, name: 'Aventura' },
+  ],
+  credits: {
+    cast: Array.from({ length: 20 }, (_, index) => ({
+      id: index,
+      name: `Ator ${index}`,
+      character: `Personagem ${index}`,
+      profile_path: null,
+      order: index,
+    })),
+  },
+  videos: {
+    results: [
+      { key: 'teaser1', site: 'YouTube', type: 'Teaser', official: true },
+      {
+        key: 'trailer-unofficial',
+        site: 'YouTube',
+        type: 'Trailer',
+        official: false,
+      },
+      {
+        key: 'trailer-official',
+        site: 'YouTube',
+        type: 'Trailer',
+        official: true,
+      },
+      { key: 'vimeo1', site: 'Vimeo', type: 'Trailer', official: true },
+    ],
+  },
+}
+
+describe('mapMovieDetails', () => {
+  it('derives genreIds from the full genre objects and maps extra fields', () => {
+    const mapped = mapMovieDetails(detailsDto)
+    expect(mapped.genreIds).toEqual([878, 12])
+    expect(mapped.tagline).toBe('A guerra pela especiaria.')
+    expect(mapped.runtime).toBe(155)
+    expect(mapped.genres).toHaveLength(2)
+  })
+
+  it('caps the cast at 12 members', () => {
+    expect(mapMovieDetails(detailsDto).cast).toHaveLength(12)
+  })
+
+  it('prefers the official YouTube trailer', () => {
+    expect(mapMovieDetails(detailsDto).trailerKey).toBe('trailer-official')
+  })
+
+  it('returns null trailer when there is no YouTube video', () => {
+    const mapped = mapMovieDetails({ ...detailsDto, videos: { results: [] } })
+    expect(mapped.trailerKey).toBeNull()
   })
 })

@@ -1,7 +1,7 @@
 # CineDash — Arquitetura
 
-Documento vivo. Cobre até a **parte 2** (fundação + autenticação simulada); as
-próximas features seguem as mesmas regras. Veja o Roadmap no fim.
+Cobre as 5 partes do desafio (fundação, auth simulada, dashboard de descoberta,
+watchlist, detalhes do filme). Veja o Roadmap no fim.
 
 ## Visão geral da stack
 
@@ -18,31 +18,32 @@ próximas features seguem as mesmas regras. Veja o Roadmap no fim.
 
 Nenhuma alternativa fora da stack obrigatória foi usada.
 
-## Estrutura de pastas — Feature-Sliced Design + camadas Clean
+## Estrutura de pastas — modular + camadas Clean
 
 ```
 src/
-  app/        # composição da aplicação: providers, router, estilos globais, bootstrap
-  pages/      # uma pasta por rota — apenas orquestra widgets/features
-  widgets/    # blocos de UI compostos e reutilizáveis entre páginas (ex.: app-layout)
-  features/   # unidades de negócio com estado/efeito (ex.: theme; depois: auth, discovery…)
-  entities/   # modelos de domínio compartilhados (ex.: movie, genre) — tipos e mappers
-  shared/     # base agnóstica de domínio: api client, config, libs, componentes de UI
+  app/        # composição: providers, router, rotas, estilos globais, bootstrap
+  modules/    # áreas de rota (dashboard, watchlist, movie-details, login, not-found)
+  widgets/    # blocos de UI reutilizáveis entre módulos (ex.: app-layout)
+  features/   # comportamento transversal com estado/efeito (auth, theme, watchlist)
+  entities/   # domínio compartilhado (movie: tipos, mappers DTO→domínio, services + hooks TMDB)
+  shared/     # base agnóstica de domínio: http client, config, libs, componentes de UI
 ```
 
-Dentro de cada slice de `features/*` e `widgets/*` as **camadas Clean** (páginas
-são finas o suficiente para ficarem num arquivo só):
+Dentro de cada slice de `modules/*`, `features/*`, `widgets/*` e `entities/*` as
+**camadas Clean**:
 
-| Pasta      | Responsabilidade                                          | Pode depender de        |
-| ---------- | --------------------------------------------------------- | ----------------------- |
-| `model/`   | regra de negócio: stores, hooks, casos de uso             | `shared`, `entities`    |
-| `api/`     | acesso a dados: serviços que falam com o `httpClient`     | `shared`, `entities`    |
-| `ui/`      | apresentação: componentes React "burros"                  | `model`, `ui`, `shared` |
-| `index.ts` | **public API** do slice — o único ponto de import externo | —                       |
+| Pasta      | Responsabilidade                                        | Pode depender de            |
+| ---------- | ------------------------------------------------------- | --------------------------- |
+| `pages/`   | (só em `modules/`) compõe ui + model da rota            | tudo abaixo                 |
+| `model/`   | regra de negócio: stores, hooks, schemas, casos de uso  | `api`, `entities`, `shared` |
+| `api/`     | acesso a dados: services + mappers sobre o `httpClient` | `entities`, `shared`        |
+| `ui/`      | apresentação: componentes React "burros"                | `model`, `ui`, `shared`     |
+| `index.ts` | **public API** do slice — único ponto de import externo | —                           |
 
 ### Regra de dependência (imposta por lint)
 
-`app → pages → widgets → features → entities → shared`
+`app → modules → widgets → features → entities → shared`
 
 Uma camada só importa de camadas **abaixo** dela, e slices do mesmo nível **não**
 se importam (ex.: uma feature não importa outra feature). Isso é verificado pelo
@@ -68,9 +69,10 @@ src/app/routes/
   $.tsx                   # 404 (catch-all)
 ```
 
-Os arquivos em `routes/` são finos: só declaram a rota e apontam para a página
-correspondente em `src/pages/*`. A lógica de sessão mora em `features/auth`; a
-rota `_authenticated/route.tsx` apenas a consome no `beforeLoad` (ver abaixo).
+Os arquivos em `routes/` são finos: declaram a rota (path, `validateSearch`,
+guard) e apontam para a página em `src/modules/*/pages/*`. A lógica de sessão
+mora em `features/auth`; `_authenticated/route.tsx` só a consome no `beforeLoad`.
+`_authenticated/movie.$movieId.tsx` cobre `/movie/:id`.
 
 ### Separação UI / Lógica / Dados
 
@@ -129,24 +131,92 @@ O `logout` fica no `UserMenu` do `app-layout` (widget → feature): `signOut()` 
   no `<html>`. Montado em `app/providers/app-providers.tsx`.
 - `ui/theme-toggle.tsx` — dropdown (shadcn) no header.
 
-## Desafios com a API do TMDB (a detalhar nas próximas partes)
+## Dashboard de descoberta (`entities/movie` + `modules/dashboard`)
 
-- Autenticação por **Bearer token (v4)** no header `Authorization`, não por
-  `api_key` na query — encapsulado no `httpClient` para não repetir.
-- Imagens vêm em paths relativos (`/abc.jpg`); a URL completa depende de um
-  `size` do CDN (`VITE_TMDB_IMAGE_BASE_URL` + size + path).
-- Gêneros são retornados como IDs nos filmes; a lista nome↔id vem de um endpoint
-  separado (`/genre/movie/list`) e será cacheada com `staleTime` longo.
-- Paginação do TMDB é limitada a 500 páginas e o `total_results` nem sempre bate
-  com `page * 20` — a UI de paginação precisa tratar isso.
+**Fonte de verdade = a URL.** O estado de busca/filtros/página vive nos search
+params, validados por Zod em `_authenticated/index.tsx` (`dashboardSearchSchema`,
+com `.catch()` em cada campo para URLs adulteradas não quebrarem). Benefícios:
+compartilhável, back/forward funciona, sobrevive ao refresh, e a query key do
+TanStack Query sai direto dos filtros.
+
+Fluxo de dados:
+
+```
+URL search params ──(useDashboardFilters)──▶ DashboardPage
+   │                                              │ toMovieQuery()
+   │                                              ▼
+   │                                       useMoviesQuery ──▶ entities/movie.fetchMovies
+   ▼                                                              │
+useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
+                                                    /discover/movie  ou  /search/movie
+```
+
+- **`entities/movie/api/`** — `movies-service.ts` decide entre `/discover/movie`
+  (filtros nativos: `with_genres`, `primary_release_year`, `vote_average.gte`) e
+  `/search/movie` (quando há texto; gênero/nota aplicados client-side, pois a
+  busca do TMDB os ignora). `movie-mappers.ts` converte o DTO `snake_case` para o
+  domínio e limita `totalPages` a 500 (teto do TMDB).
+- **`model/use-movies-query.ts`** — `useQuery` com `placeholderData: keepPreviousData`
+  (paginação sem flash) e `staleTime` de 1 min.
+- **`entities/movie/model/use-genres-query.ts`** — lista de gêneros
+  (`staleTime: Infinity`) + `useGenres()` com `resolve(ids)`; fica no entity
+  porque dashboard e watchlist consomem.
+- **Debounce** — `shared/lib/use-debounced-value` (sobre o util `debounce`);
+  `useSearchInput` faz o bind bidirecional input↔URL sem loop de eco (ref guarda
+  o último valor propagado).
+- **Prefetch** — a página faz `queryClient.prefetchQuery` da próxima página
+  sempre que há mais páginas.
+- **Paginação** — `DashboardPagination` mostra páginas numeradas com reticências
+  (`shared/lib/pagination-range`, testado) + "Página X de Y".
+- **Estados** — `MovieGrid` cobre loading (skeletons), erro (com retry) e vazio.
+
+## Watchlist (`features/watchlist` + `modules/watchlist`)
+
+- **`features/watchlist/model/watchlist-store.ts`** — Zustand + `persist`
+  (`cinedash:watchlist`). Guarda um **snapshot enxuto** de cada filme
+  (`toWatchlistMovie`) para a tabela funcionar offline. `toggle` devolve o
+  estado resultante (para o toast). `add` deduplica por id.
+- **`features/watchlist/ui/watchlist-toggle-button.tsx`** — usado no card do
+  dashboard (variante `icon`, com `preventDefault` porque o card é um `<Link>`)
+  e depois na página de detalhes.
+- **`modules/watchlist`** — a `WatchlistPage` resolve os nomes de gênero
+  (`useGenres`) e passa as linhas já prontas para `WatchlistTable`; a tabela
+  não faz data-fetching. **TanStack Table** (`@tanstack/react-table` v8):
+  `getSortedRowModel`, colunas ordenáveis por Título, Gênero e Lançamento
+  (cabeçalho clicável). Remover linha e "Limpar lista" agem no store.
+- Contador no header (`useWatchlistCount`) e link ativo via `<Link activeProps>`.
+
+## Detalhes do filme (`modules/movie-details`)
+
+- **`entities/movie/api/movie-details-service.ts`** — `fetchMovieDetails(id)` faz
+  uma única chamada `/movie/{id}?append_to_response=credits,videos`;
+  `mapMovieDetails` normaliza (deriva `genreIds` dos `genres`, corta o elenco em
+  12, e `pickTrailerKey` escolhe o melhor trailer do YouTube — oficial > qualquer
+  Trailer > primeiro vídeo).
+- **`model/use-movie-details-query.ts`** — `useQuery` chaveado por
+  `queryKeys.movies.detail(id)`, `enabled` só para id válido, **sem retry em 404**
+  (id errado não adianta repetir).
+- **`pages/movie-details-page.tsx`** — trata id inválido / 404 ("Filme não
+  encontrado"), loading (skeleton) e erro (retry). O `MovieDetailsView` renderiza
+  hero (backdrop + pôster + meta + sinopse + `WatchlistToggleButton`), trailer
+  (iframe `youtube-nocookie`) e elenco. `MovieDetails` estende `MovieListItem`,
+  então o botão de watchlist aceita direto.
+
+### Notas da API do TMDB
+
+- Auth por **Bearer token (v4)** no header, não `api_key` na query — no `httpClient`.
+- Imagens são paths relativos; `posterUrl(path, size)` monta a URL do CDN.
+- Gêneros vêm como IDs nos filmes; nome↔id vem de `/genre/movie/list` (cacheado).
+- `total_pages` do TMDB pode passar de 500, mas só 500 são navegáveis.
 
 ## Roadmap
 
-1. ✅ **Fundação** — tooling, estrutura FSD, providers, layout, tema, testes base.
+1. ✅ **Fundação** — tooling, estrutura modular, providers, layout, tema, testes base.
 2. ✅ **Auth simulada** — login (RHF + Zod), token fictício persistido, guards de
    rota público/privado, logout.
-3. **Dashboard de descoberta** — listagem (trending/popular), busca com debounce,
-   filtros (gênero, ano, nota), paginação/infinite scroll, skeletons e error states.
-4. **Watchlist** — add/remove, persistência (Zustand `persist`), tabela com
-   `TanStack Table` (ordenar por título, gênero, rating).
-5. **Detalhes do filme** — rota `/movie/$id`, sinopse, elenco, trailer, toggle na lista.
+3. ✅ **Dashboard de descoberta** — grid `/discover` + `/search`, busca com debounce,
+   filtros (gênero, ano, nota) e paginação numerada na URL, skeletons/erro/vazio, prefetch.
+4. ✅ **Watchlist** — add/remove/limpar, persistência (Zustand `persist`), tabela
+   com `TanStack Table` (ordenar por título, gênero e lançamento).
+5. ✅ **Detalhes do filme** — `/movie/$movieId`: sinopse, meta, elenco (top 12),
+   trailer do YouTube, toggle na watchlist; trata 404 / id inválido.

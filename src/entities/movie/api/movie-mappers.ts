@@ -1,6 +1,11 @@
-import type { MovieListItem, Paginated } from '../model/types'
+import type { MovieDetails, MovieListItem, Paginated } from '../model/types'
 
-import type { TmdbMovieDto, TmdbPaginatedDto } from './tmdb-dto'
+import type {
+  TmdbMovieDetailsDto,
+  TmdbMovieDto,
+  TmdbPaginatedDto,
+  TmdbVideoDto,
+} from './tmdb-dto'
 
 function parseYear(releaseDate: string): number | null {
   const year = Number.parseInt(releaseDate.slice(0, 4), 10)
@@ -31,5 +36,34 @@ export function mapPaginated(
     totalPages: Math.min(dto.total_pages, 500),
     totalResults: dto.total_results,
     results: dto.results.map(mapMovieListItem),
+  }
+}
+
+/** Picks the best trailer: an official YouTube "Trailer", else any YouTube video. */
+function pickTrailerKey(videos: TmdbVideoDto[] = []): string | null {
+  const youtube = videos.filter((video) => video.site === 'YouTube')
+  const trailer =
+    youtube.find((video) => video.type === 'Trailer' && video.official) ??
+    youtube.find((video) => video.type === 'Trailer') ??
+    youtube[0]
+  return trailer?.key ?? null
+}
+
+const MAX_CAST = 12
+
+export function mapMovieDetails(dto: TmdbMovieDetailsDto): MovieDetails {
+  return {
+    ...mapMovieListItem(dto),
+    genreIds: dto.genres.map((genre) => genre.id),
+    tagline: dto.tagline || null,
+    runtime: dto.runtime || null,
+    genres: dto.genres,
+    cast: (dto.credits?.cast ?? []).slice(0, MAX_CAST).map((member) => ({
+      id: member.id,
+      name: member.name,
+      character: member.character,
+      profilePath: member.profile_path,
+    })),
+    trailerKey: pickTrailerKey(dto.videos?.results),
   }
 }

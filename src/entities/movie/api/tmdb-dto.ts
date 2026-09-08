@@ -22,3 +22,26 @@ export interface TmdbPaginatedDto<T> {
 export interface TmdbGenreListDto {
   genres: Array<{ id: number; name: string }>
 }
+
+export interface TmdbVideoDto {
+  key: string
+  site: string
+  type: string
+  official: boolean
+}
+
+export interface TmdbCastMemberDto {
+  id: number
+  name: string
+  character: string
+  profile_path: string | null
+  order: number
+}
+
+export interface TmdbMovieDetailsDto extends TmdbMovieDto {
+  tagline: string | null
+  runtime: number | null
+  genres: Array<{ id: number; name: string }>
+  credits?: { cast: TmdbCastMemberDto[] }
+  videos?: { results: TmdbVideoDto[] }
+}
