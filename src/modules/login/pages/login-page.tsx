@@ -4,17 +4,19 @@ import { FilmIcon } from 'lucide-react'
 import { LoginForm } from '@/features/auth'
 import {
   Card,
+  CardTitle,
+  CardHeader,
   CardContent,
   CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/shared/ui/card'
 
+// interface
 interface LoginPageProps {
   redirectTo?: string
 }
 
 export const LoginPage = ({ redirectTo }: LoginPageProps) => {
+  // hooks
   const navigate = useNavigate()
 
   return (
