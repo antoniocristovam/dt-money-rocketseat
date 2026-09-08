@@ -1,4 +1,11 @@
-import { XIcon } from 'lucide-react'
+import {
+  CalendarIcon,
+  Loader2Icon,
+  StarIcon,
+  TagsIcon,
+  XIcon,
+} from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { useGenresQuery } from '@/entities/movie'
 import { Button } from '@/shared/ui/button'
@@ -20,22 +27,53 @@ function toValue(raw: string): number | undefined {
   return raw === ALL ? undefined : Number(raw)
 }
 
+function TriggerLabel({
+  icon,
+  placeholder,
+}: {
+  icon: ReactNode
+  placeholder: string
+}) {
+  return (
+    <span className="flex items-center gap-2 truncate">
+      {icon}
+      <SelectValue placeholder={placeholder} />
+    </span>
+  )
+}
+
 export function MovieFilters() {
   const { filters, setFilters, resetFilters, hasActiveFilters } =
     useDashboardFilters()
-  const { data: genres = [] } = useGenresQuery()
+  const genresQuery = useGenresQuery()
+  const genres = genresQuery.data ?? []
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Select
         value={filters.genre ? String(filters.genre) : ALL}
         onValueChange={(value) => setFilters({ genre: toValue(value) })}
+        disabled={genresQuery.isLoading}
       >
-        <SelectTrigger className="w-[150px]" aria-label="Gênero">
-          <SelectValue placeholder="Gênero" />
+        <SelectTrigger className="min-w-[168px]" aria-label="Gênero">
+          <TriggerLabel
+            placeholder="Gênero"
+            icon={
+              genresQuery.isLoading ? (
+                <Loader2Icon className="animate-spin" />
+              ) : (
+                <TagsIcon />
+              )
+            }
+          />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Todos os gêneros</SelectItem>
+          {genresQuery.isError ? (
+            <p className="px-2 py-1.5 text-sm text-muted-foreground">
+              Não foi possível carregar os gêneros.
+            </p>
+          ) : null}
           {genres.map((genre) => (
             <SelectItem key={genre.id} value={String(genre.id)}>
               {genre.name}
@@ -48,8 +86,8 @@ export function MovieFilters() {
         value={filters.year ? String(filters.year) : ALL}
         onValueChange={(value) => setFilters({ year: toValue(value) })}
       >
-        <SelectTrigger className="w-[120px]" aria-label="Ano de lançamento">
-          <SelectValue placeholder="Ano" />
+        <SelectTrigger className="min-w-[150px]" aria-label="Ano de lançamento">
+          <TriggerLabel placeholder="Ano" icon={<CalendarIcon />} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Qualquer ano</SelectItem>
@@ -65,14 +103,14 @@ export function MovieFilters() {
         value={filters.minRating ? String(filters.minRating) : ALL}
         onValueChange={(value) => setFilters({ minRating: toValue(value) })}
       >
-        <SelectTrigger className="w-[130px]" aria-label="Nota mínima">
-          <SelectValue placeholder="Nota mínima" />
+        <SelectTrigger className="min-w-[160px]" aria-label="Nota mínima">
+          <TriggerLabel placeholder="Nota mínima" icon={<StarIcon />} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value={ALL}>Qualquer nota</SelectItem>
           {RATING_OPTIONS.map((option) => (
             <SelectItem key={option.value} value={String(option.value)}>
-              {option.label}
+              {option.label} ou mais
             </SelectItem>
           ))}
         </SelectContent>

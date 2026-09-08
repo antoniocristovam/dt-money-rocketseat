@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react'
 
 import { type MovieQuery, fetchMovies, useGenresQuery } from '@/entities/movie'
 import { queryKeys } from '@/shared/api/query-keys'
+import { cn } from '@/shared/lib/cn'
 
 import type { DashboardSearch } from '../model/search-schema'
 import { useDashboardFilters } from '../model/use-dashboard-filters'
@@ -32,6 +33,8 @@ export const DashboardPage = () => {
 
   const page = moviesQuery.data
   const totalPages = page?.totalPages ?? 0
+  // Background refetch (filters/search/page changed) while old results stay on screen.
+  const isRefetching = moviesQuery.isFetching && !moviesQuery.isLoading
 
   // Prefetch the next page so forward pagination feels instant.
   useEffect(() => {
@@ -54,7 +57,7 @@ export const DashboardPage = () => {
       </header>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <SearchInput />
+        <SearchInput isFetching={moviesQuery.isFetching} />
         <MovieFilters />
       </div>
 
@@ -64,13 +67,20 @@ export const DashboardPage = () => {
         </p>
       ) : null}
 
-      <MovieGrid
-        movies={page?.results ?? []}
-        genres={genresQuery.data ?? []}
-        isLoading={moviesQuery.isLoading}
-        isError={moviesQuery.isError}
-        onRetry={() => void moviesQuery.refetch()}
-      />
+      <div
+        className={cn(
+          'transition-opacity',
+          isRefetching && 'pointer-events-none opacity-60',
+        )}
+      >
+        <MovieGrid
+          movies={page?.results ?? []}
+          genres={genresQuery.data ?? []}
+          isLoading={moviesQuery.isLoading}
+          isError={moviesQuery.isError}
+          onRetry={() => void moviesQuery.refetch()}
+        />
+      </div>
 
       <DashboardPagination
         totalPages={totalPages}

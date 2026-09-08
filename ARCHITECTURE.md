@@ -163,11 +163,15 @@ useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
   porque dashboard e watchlist consomem.
 - **Debounce** — `shared/lib/use-debounced-value` (sobre o util `debounce`);
   `useSearchInput` faz o bind bidirecional input↔URL sem loop de eco (ref guarda
-  o último valor propagado).
+  o último valor propagado) e expõe `isDebouncing`.
 - **Prefetch** — a página faz `queryClient.prefetchQuery` da próxima página
   sempre que há mais páginas.
 - **Paginação** — `DashboardPagination` mostra páginas numeradas com reticências
   (`shared/lib/pagination-range`, testado) + "Página X de Y".
+- **Feedback de carga** — spinner no `SearchInput` enquanto digita ou enquanto
+  uma busca ativa está em voo; a grade fica em `opacity-60` durante o refetch de
+  fundo (`keepPreviousData` mantém os resultados antigos); o select de gênero
+  mostra spinner e fica `disabled` enquanto `useGenresQuery` carrega.
 - **Estados** — `MovieGrid` cobre loading (skeletons), erro (com retry) e vazio.
 
 ## Watchlist (`features/watchlist` + `modules/watchlist`)

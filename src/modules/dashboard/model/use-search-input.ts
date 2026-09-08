@@ -30,5 +30,8 @@ export function useSearchInput(
     }
   }, [debounced, onCommit])
 
-  return { text, setText }
+  /** `true` while the user is still typing and the debounce hasn't fired. */
+  const isDebouncing = text.trim() !== debounced.trim()
+
+  return { text, setText, isDebouncing }
 }
