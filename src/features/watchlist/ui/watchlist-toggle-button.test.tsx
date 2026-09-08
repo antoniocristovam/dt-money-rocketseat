@@ -8,7 +8,15 @@ import { useWatchlistStore } from '../model/watchlist-store'
 
 import { WatchlistToggleButton } from './watchlist-toggle-button'
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn() } }))
+vi.mock('@/shared/lib/notify', () => ({
+  notify: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    fromError: vi.fn(),
+  },
+}))
 
 const movie = {
   id: 42,

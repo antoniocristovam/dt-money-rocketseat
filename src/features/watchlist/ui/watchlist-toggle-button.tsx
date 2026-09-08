@@ -1,9 +1,9 @@
 import { BookmarkCheckIcon, BookmarkPlusIcon } from 'lucide-react'
 import type { MouseEvent } from 'react'
-import { toast } from 'sonner'
 
 import type { MovieListItem } from '@/_core/models/responses/movie'
 import { cn } from '@/shared/lib/cn'
+import { notify } from '@/shared/lib/notify'
 import { Button } from '@/shared/ui/button'
 
 import { useIsInWatchlist, useWatchlistActions } from '../model/use-watchlist'
@@ -27,7 +27,7 @@ export function WatchlistToggleButton({
     event.preventDefault()
     event.stopPropagation()
     const added = toggle(movie)
-    toast.success(
+    notify.success(
       added
         ? `"${movie.title}" adicionado à sua lista`
         : `"${movie.title}" removido`,

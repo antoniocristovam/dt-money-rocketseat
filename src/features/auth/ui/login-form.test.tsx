@@ -6,7 +6,15 @@ import { useSessionStore } from '../model/session-store'
 
 import { LoginForm } from './login-form'
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }))
+vi.mock('@/shared/lib/notify', () => ({
+  notify: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    fromError: vi.fn(),
+  },
+}))
 
 afterEach(() => {
   useSessionStore.setState({ token: null, user: null })

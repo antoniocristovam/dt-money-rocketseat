@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+
+import { notify } from '@/shared/lib/notify'
 
 import { type LoginFormValues, loginSchema } from './login-schema'
 import { useSessionStore } from './session-store'
@@ -23,7 +24,7 @@ export function useLogin({ onSuccess }: UseLoginOptions) {
   const submit = form.handleSubmit(async ({ email }) => {
     await new Promise((resolve) => setTimeout(resolve, FAKE_LATENCY_MS))
     signIn({ email, name: email.split('@')[0] ?? email })
-    toast.success('Bem-vindo(a) ao CineDash')
+    notify.success('Bem-vindo(a) ao CineDash')
     onSuccess()
   })
 

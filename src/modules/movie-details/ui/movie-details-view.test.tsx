@@ -8,7 +8,15 @@ import { useWatchlistStore } from '@/features/watchlist'
 
 import { MovieDetailsView } from './movie-details-view'
 
-vi.mock('sonner', () => ({ toast: { success: vi.fn() } }))
+vi.mock('@/shared/lib/notify', () => ({
+  notify: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    fromError: vi.fn(),
+  },
+}))
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children }: { children: ReactNode }) => <a>{children}</a>,
 }))
