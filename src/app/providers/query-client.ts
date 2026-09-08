@@ -44,7 +44,11 @@ export function createQueryClient(): QueryClient {
         staleTime: 60_000,
         gcTime: 5 * 60_000,
         refetchOnWindowFocus: false,
+        // Always run the request and treat failures as errors (so `onError`
+        // fires) instead of silently pausing on flaky `navigator.onLine`.
+        networkMode: 'always',
       },
+      mutations: { networkMode: 'always' },
     },
   })
 }

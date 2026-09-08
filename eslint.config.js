@@ -142,6 +142,9 @@ export default defineConfig([
       // Vitest matchers (`expect.objectContaining`, mock helpers) are loosely typed.
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
+      // Tests deliberately reject with arbitrary values and use throwaway query keys.
+      '@typescript-eslint/prefer-promise-reject-errors': 'off',
+      '@tanstack/query/exhaustive-deps': 'off',
     },
   },
   {
