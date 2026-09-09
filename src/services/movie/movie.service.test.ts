@@ -1,14 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { TmdbMovieDto } from '@/_core/models/dtos/movie'
-import { httpClient } from '@/shared/api/http-client'
+import { tmdbClient } from '@/shared/api/tmdb-client'
 
 import { MovieService } from './movie.service'
 
-vi.mock('@/shared/api/http-client', () => ({ httpClient: vi.fn() }))
+vi.mock('@/shared/api/tmdb-client', () => ({ tmdbClient: { get: vi.fn() } }))
 
-const mockedHttp = vi.mocked(httpClient)
+const mockedGet = vi.mocked(tmdbClient.get)
 const service = new MovieService()
+
+/** Wrap a payload the way axios hands it back: `{ data }`. */
+function respondWith(data: unknown) {
+  mockedGet.mockResolvedValue({ data })
+}
 
 function moviePage(results: Partial<TmdbMovieDto>[]) {
   return {
@@ -31,16 +36,16 @@ function moviePage(results: Partial<TmdbMovieDto>[]) {
 }
 
 beforeEach(() => {
-  mockedHttp.mockReset()
+  mockedGet.mockReset()
 })
 
 describe('MovieService.getMovies', () => {
   it('chama /discover/movie com os filtros mapeados quando não há busca por texto', async () => {
-    mockedHttp.mockResolvedValue(moviePage([]))
+    respondWith(moviePage([]))
 
     await service.getMovies({ page: 2, genreId: 28, year: 1999, minRating: 8 })
 
-    expect(mockedHttp).toHaveBeenCalledWith('/discover/movie', {
+    expect(mockedGet).toHaveBeenCalledWith('/discover/movie', {
       params: expect.objectContaining({
         page: 2,
         with_genres: 28,
@@ -52,11 +57,11 @@ describe('MovieService.getMovies', () => {
   })
 
   it('chama /search/movie quando há busca por texto', async () => {
-    mockedHttp.mockResolvedValue(moviePage([]))
+    respondWith(moviePage([]))
 
     await service.getMovies({ page: 1, query: 'matrix' })
 
-    expect(mockedHttp).toHaveBeenCalledWith(
+    expect(mockedGet).toHaveBeenCalledWith(
       '/search/movie',
       expect.objectContaining({
         params: expect.objectContaining({ query: 'matrix', page: 1 }),
@@ -65,7 +70,7 @@ describe('MovieService.getMovies', () => {
   })
 
   it('aplica gênero e nota no client-side nos resultados da busca', async () => {
-    mockedHttp.mockResolvedValue(
+    respondWith(
       moviePage([
         { genre_ids: [28], vote_average: 9 },
         { genre_ids: [35], vote_average: 9 },
@@ -87,7 +92,7 @@ describe('MovieService.getMovies', () => {
 
 describe('MovieService.getMovieDetails', () => {
   it('pede o filme com credits + videos e retorna o modelo de domínio', async () => {
-    mockedHttp.mockResolvedValue({
+    respondWith({
       ...moviePage([{}]).results[0],
       title: 'Duna',
       tagline: '',
@@ -97,7 +102,7 @@ describe('MovieService.getMovieDetails', () => {
 
     const details = await service.getMovieDetails({ id: 693134 })
 
-    expect(mockedHttp).toHaveBeenCalledWith('/movie/693134', {
+    expect(mockedGet).toHaveBeenCalledWith('/movie/693134', {
       params: { append_to_response: 'credits,videos' },
     })
     expect(details.title).toBe('Duna')
@@ -107,11 +112,11 @@ describe('MovieService.getMovieDetails', () => {
 
 describe('MovieService.getGenres', () => {
   it('desembrulha o array genres do payload do TMDB', async () => {
-    mockedHttp.mockResolvedValue({ genres: [{ id: 1, name: 'Ação' }] })
+    respondWith({ genres: [{ id: 1, name: 'Ação' }] })
 
     await expect(service.getGenres()).resolves.toEqual([
       { id: 1, name: 'Ação' },
     ])
-    expect(mockedHttp).toHaveBeenCalledWith('/genre/movie/list')
+    expect(mockedGet).toHaveBeenCalledWith('/genre/movie/list')
   })
 })

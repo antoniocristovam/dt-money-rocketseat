@@ -50,6 +50,9 @@ src/_core/models/
   dtos/movie/         tmdb-movie.dto.ts        (formas cruas da API TMDB)
   mappers/movie/      movie.mappers.ts         (DTO → domínio)
   helpers/movie/      genre-names.ts
+src/shared/api/
+  tmdb-client.ts               axios.create() + interceptor que normaliza erro → HttpError
+  http-error.ts                HttpError — o tipo de erro único do app
 src/services/movie/
   movie.service.interface.ts   IMovieService — o contrato dos casos de uso
   movie.service.ts             class MovieService implements IMovieService + singleton `movieService`
@@ -57,9 +60,13 @@ src/services/movie/
 
 - **Params/Responses** (`_core/models`) — um arquivo por tipo, barris `index.ts` em
   cada nível. O caller só lida com shapes de domínio, nunca com DTO `snake_case`.
+- **Cliente HTTP** (`shared/api/tmdb-client.ts`) — um único `axios.create()` com a
+  `baseURL` e o header `Authorization: Bearer <token>` definidos uma vez. Um
+  interceptor de resposta converte qualquer `AxiosError` em `HttpError` (status +
+  corpo da resposta), então o resto do app nunca vê tipos do axios.
 - **Service** (`services/movie`) — cada método (`getMovies`, `getMovieDetails`,
-  `getGenres`) recebe `params` tipado, faz a request via `httpClient` e mapeia
-  DTO→domínio. Não engole erro: o `HttpError` propaga para o TanStack Query.
+  `getGenres`) recebe `params` tipado, chama `tmdbClient.get(path, { params })` e
+  mapeia DTO→domínio. Não engole erro: o `HttpError` propaga para o TanStack Query.
   Instância única exportada (`movieService`) — DI leve, sem provider.
 - **Hooks** — `modules/<m>/hooks/use-*.tsx` (e `features/genres/hooks/use-genres.tsx`).
   Cada hook é um `useQuery` cuja `queryFn` é uma `request*` memoizada que chama
@@ -103,7 +110,7 @@ mora em `features/auth`; `_authenticated/route.tsx` só a consome no `beforeLoad
 - **UI** (`components/`): recebe dados por props, dispara callbacks. Sem `fetch`, sem store.
 - **Lógica** (`model/` + `hooks/`): hooks e stores — debounce, seleção de tema,
   filtros da URL, e os hooks de dados (`use-movies`, `use-movie-details`, `use-genres`).
-- **Dados**: `shared/api/http-client.ts` (fetch tipado) → `services/movie` (casos
+- **Dados**: `shared/api/tmdb-client.ts` (instância axios) → `services/movie` (casos
   de uso) → `_core/models` (params/responses/dtos/mappers). Ver a seção "Camada de
   dados" acima. As chaves de cache do TanStack Query ficam em `shared/api/query-keys.ts`.
 
@@ -232,7 +239,8 @@ useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
 
 ### Notas da API do TMDB
 
-- Auth por **Bearer token (v4)** no header, não `api_key` na query — no `httpClient`.
+- Auth por **Bearer token (v4)** no header, não `api_key` na query — configurado
+  uma vez na instância axios (`shared/api/tmdb-client.ts`).
 - Imagens são paths relativos; `posterUrl(path, size)` monta a URL do CDN.
 - Gêneros vêm como IDs nos filmes; nome↔id vem de `/genre/movie/list` (cacheado).
 - `total_pages` do TMDB pode passar de 500, mas só 500 são navegáveis.

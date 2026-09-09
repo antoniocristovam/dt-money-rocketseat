@@ -16,7 +16,7 @@ import type {
   GetMoviesResponse,
   GetMovieDetailsResponse,
 } from '@/_core/models/responses/movie'
-import { httpClient } from '@/shared/api/http-client'
+import { tmdbClient } from '@/shared/api/tmdb-client'
 
 import type { IMovieService } from './movie.service.interface'
 
@@ -42,7 +42,7 @@ function applyClientFilters(
 export class MovieService implements IMovieService {
   async getMovies(params: GetMoviesParams): Promise<GetMoviesResponse> {
     if (isTextSearch(params)) {
-      const dto = await httpClient<TmdbPaginatedDto<TmdbMovieDto>>(
+      const { data } = await tmdbClient.get<TmdbPaginatedDto<TmdbMovieDto>>(
         '/search/movie',
         {
           params: {
@@ -53,10 +53,10 @@ export class MovieService implements IMovieService {
           },
         },
       )
-      return applyClientFilters(mapPaginated(dto), params)
+      return applyClientFilters(mapPaginated(data), params)
     }
 
-    const dto = await httpClient<TmdbPaginatedDto<TmdbMovieDto>>(
+    const { data } = await tmdbClient.get<TmdbPaginatedDto<TmdbMovieDto>>(
       '/discover/movie',
       {
         params: {
@@ -70,21 +70,21 @@ export class MovieService implements IMovieService {
         },
       },
     )
-    return mapPaginated(dto)
+    return mapPaginated(data)
   }
 
   async getMovieDetails({
     id,
   }: GetMovieDetailsParams): Promise<GetMovieDetailsResponse> {
-    const dto = await httpClient<TmdbMovieDetailsDto>(`/movie/${id}`, {
+    const { data } = await tmdbClient.get<TmdbMovieDetailsDto>(`/movie/${id}`, {
       params: { append_to_response: 'credits,videos' },
     })
-    return mapMovieDetails(dto)
+    return mapMovieDetails(data)
   }
 
   async getGenres(): Promise<GetGenresResponse> {
-    const dto = await httpClient<TmdbGenreListDto>('/genre/movie/list')
-    return dto.genres
+    const { data } = await tmdbClient.get<TmdbGenreListDto>('/genre/movie/list')
+    return data.genres
   }
 }
 

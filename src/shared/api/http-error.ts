@@ -1,4 +1,4 @@
-/** Error thrown by {@link httpClient} for any non-2xx response. */
+/** Error thrown by {@link tmdbClient} for any failed request (non-2xx or network). */
 export class HttpError extends Error {
   readonly status: number
   readonly payload: unknown
