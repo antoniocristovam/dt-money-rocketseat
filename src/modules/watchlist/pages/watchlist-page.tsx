@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { useGenres } from '@/features/genres'
 import { useWatchlist, useWatchlistActions } from '@/features/watchlist'
+import { EmptyState } from '@/shared/components/empty-state'
 import { Button } from '@/shared/ui/button'
 
 import { WatchlistTable } from '../components/watchlist-table'
@@ -44,18 +45,16 @@ export const WatchlistPage = () => {
       </header>
 
       {rows.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
-          <BookmarkIcon className="size-8 text-muted-foreground" />
-          <div className="space-y-1">
-            <p className="font-medium">Sua estante está vazia</p>
-            <p className="text-sm text-muted-foreground">
-              Adicione filmes pelo botão de marcador no dashboard.
-            </p>
-          </div>
-          <Button asChild>
-            <Link to="/">Explorar filmes</Link>
-          </Button>
-        </div>
+        <EmptyState
+          icon={<BookmarkIcon />}
+          title="Sua estante está vazia"
+          description="Adicione filmes pelo botão de marcador no dashboard."
+          action={
+            <Button asChild>
+              <Link to="/">Explorar filmes</Link>
+            </Button>
+          }
+        />
       ) : (
         <WatchlistTable rows={rows} />
       )}
