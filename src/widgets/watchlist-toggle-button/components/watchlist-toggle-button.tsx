@@ -15,8 +15,8 @@ interface WatchlistToggleButtonProps {
 
 export function WatchlistToggleButton({
   movie,
-  variant = 'default',
   className,
+  variant = 'default',
 }: WatchlistToggleButtonProps) {
   const inList = useIsInWatchlist(movie.id)
   const { toggle } = useWatchlistActions()
@@ -41,11 +41,11 @@ export function WatchlistToggleButton({
       <Button
         type="button"
         size="icon-sm"
-        variant={inList ? 'default' : 'secondary'}
+        aria-label={label}
         onClick={handleClick}
         aria-pressed={inList}
-        aria-label={label}
         className={className}
+        variant={inList ? 'default' : 'secondary'}
       >
         <Icon className="size-4" />
       </Button>
@@ -55,10 +55,10 @@ export function WatchlistToggleButton({
   return (
     <Button
       type="button"
-      variant={inList ? 'default' : 'outline'}
       onClick={handleClick}
       aria-pressed={inList}
       className={cn(className)}
+      variant={inList ? 'default' : 'outline'}
     >
       <Icon className="size-4" />
       {label}

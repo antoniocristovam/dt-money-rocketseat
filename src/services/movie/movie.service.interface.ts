@@ -1,11 +1,11 @@
 import type {
-  GetMovieDetailsParams,
   GetMoviesParams,
+  GetMovieDetailsParams,
 } from '@/_core/models/params/movie'
 import type {
   GetGenresResponse,
-  GetMovieDetailsResponse,
   GetMoviesResponse,
+  GetMovieDetailsResponse,
 } from '@/_core/models/responses/movie'
 
 export interface IMovieService {

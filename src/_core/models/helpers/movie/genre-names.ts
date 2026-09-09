@@ -1,6 +1,5 @@
 import type { Genre } from '@/_core/models/responses/movie'
 
-/** Turns a list of TMDB genre ids into their names, in order. */
 export function genreNames(
   genreIds: number[],
   genres: Genre[],
