@@ -1,0 +1,16 @@
+import { useEffect, useMemo, useState } from 'react'
+
+import { debounce } from './debounce'
+
+export function useDebouncedValue<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value)
+
+  const update = useMemo(() => debounce(setDebounced, delay), [delay])
+
+  useEffect(() => {
+    update(value)
+    return update.cancel
+  }, [value, update])
+
+  return debounced
+}

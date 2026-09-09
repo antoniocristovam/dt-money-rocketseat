@@ -1,0 +1,158 @@
+import js from '@eslint/js'
+import pluginQuery from '@tanstack/eslint-plugin-query'
+import { defineConfig, globalIgnores } from 'eslint/config'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import boundaries from 'eslint-plugin-boundaries'
+import importX from 'eslint-plugin-import-x'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
+
+/**
+ * Architectural layers, from most to least app-specific. A layer may only import
+ * from layers below it, and slices on the same layer may not import each other.
+ * Enforced by `boundaries/dependencies`.
+ *
+ * - `modules/*` — route-level feature areas (dashboard, movie-details, watchlist…)
+ * - `features/*` — cross-cutting behaviour with state/effects (auth, theme, genres…)
+ * - `services/*` — one class per domain that talks to the API (`movieService`)
+ * - `_core/*` — pure domain models: params, responses, DTOs, mappers
+ * - `shared/*` — framework-agnostic infra: http client, UI kit, libs
+ */
+const LAYERS = [
+  'app',
+  'modules',
+  'widgets',
+  'features',
+  'services',
+  'shared',
+  '_core',
+]
+
+const fsdPolicies = LAYERS.map((layer, index) => ({
+  from: { element: { type: layer } },
+  allow: { to: { element: { types: { anyOf: LAYERS.slice(index + 1) } } } },
+})).filter((policy) => policy.allow.to.element.types.anyOf.length > 0)
+
+// These layers are single conceptual slices: their own files may import each other.
+for (const layer of ['app', 'services', 'shared', '_core']) {
+  fsdPolicies.push({
+    from: { element: { type: layer } },
+    allow: { to: { element: { type: layer } } },
+  })
+}
+
+export default defineConfig([
+  globalIgnores(['dist', 'coverage', 'src/app/routes/routeTree.gen.ts']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommendedTypeChecked,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+      pluginQuery.configs['flat/recommended'],
+    ],
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: { boundaries, 'import-x': importX },
+    settings: {
+      'boundaries/elements': [
+        { type: 'app', pattern: 'src/app/*' },
+        { type: 'modules', pattern: 'src/modules/*' },
+        { type: 'widgets', pattern: 'src/widgets/*' },
+        { type: 'features', pattern: 'src/features/*' },
+        { type: 'services', pattern: 'src/services/*' },
+        { type: 'shared', pattern: 'src/shared/*' },
+        { type: '_core', pattern: 'src/_core/*' },
+      ],
+      // `import-x/resolver` is read by import-x; `import/resolver` by boundaries.
+      'import-x/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          noWarnOnMultipleProjects: true,
+          project: ['tsconfig.app.json', 'tsconfig.node.json'],
+        },
+      },
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          noWarnOnMultipleProjects: true,
+          project: ['tsconfig.app.json', 'tsconfig.node.json'],
+        },
+      },
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      'import-x/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
+          pathGroups: [{ pattern: '@/**', group: 'internal' }],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
+      'boundaries/dependencies': [
+        'error',
+        { default: 'disallow', policies: fsdPolicies },
+      ],
+    },
+  },
+  {
+    // shadcn/ui primitives export variant helpers; route files export `Route`.
+    files: ['src/shared/ui/**/*', 'src/app/routes/**/*'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
+    // TanStack Router control flow: `throw redirect(...)` / `throw notFound()`.
+    files: ['src/app/routes/**/*'],
+    rules: { '@typescript-eslint/only-throw-error': 'off' },
+  },
+  {
+    files: ['**/*.test.{ts,tsx}', 'src/test/**/*', 'src/main.tsx'],
+    rules: {
+      'boundaries/dependencies': 'off',
+      // Vitest matchers (`expect.objectContaining`, mock helpers) are loosely typed.
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      // Tests deliberately reject with arbitrary values and use throwaway query keys.
+      '@typescript-eslint/prefer-promise-reject-errors': 'off',
+      '@tanstack/query/exhaustive-deps': 'off',
+      // `vi.mocked(obj).method` intentionally grabs the method off its object.
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
+    files: ['*.{ts,js}'],
+    languageOptions: { globals: globals.node },
+    rules: { 'boundaries/dependencies': 'off' },
+  },
+  eslintConfigPrettier,
+])
