@@ -20,8 +20,8 @@ afterEach(() => {
   useSessionStore.setState({ token: null, user: null })
 })
 
-describe('LoginForm', () => {
-  it('shows validation errors and does not sign in on invalid submit', async () => {
+describe('LoginForm (formulário de login)', () => {
+  it('mostra os erros de validação e não loga em um submit inválido', async () => {
     const user = userEvent.setup()
     const onSuccess = vi.fn()
     render(<LoginForm onSuccess={onSuccess} />)
@@ -34,7 +34,7 @@ describe('LoginForm', () => {
     expect(useSessionStore.getState().user).toBeNull()
   })
 
-  it('signs in and calls onSuccess with valid credentials', async () => {
+  it('loga e chama onSuccess com credenciais válidas', async () => {
     const user = userEvent.setup()
     const onSuccess = vi.fn()
     render(<LoginForm onSuccess={onSuccess} />)

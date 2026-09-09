@@ -19,15 +19,15 @@ afterEach(() => {
   useWatchlistStore.setState({ items: [] })
 })
 
-describe('AppLayout', () => {
-  it('hides the user menu when signed out', () => {
+describe('AppLayout (casca do app)', () => {
+  it('esconde o menu do usuário quando deslogado', () => {
     render(<AppLayout>content</AppLayout>)
     expect(
       screen.queryByRole('button', { name: /menu do usuário/i }),
     ).not.toBeInTheDocument()
   })
 
-  it('signs out and redirects to /login', async () => {
+  it('desloga e redireciona para /login', async () => {
     const user = userEvent.setup()
     useSessionStore.getState().signIn({ email: 'a@b.com', name: 'a' })
     render(<AppLayout>content</AppLayout>)

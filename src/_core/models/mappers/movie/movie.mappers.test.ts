@@ -24,7 +24,7 @@ const dto: TmdbMovieDto = {
 }
 
 describe('mapMovieListItem', () => {
-  it('maps snake_case DTO to the domain shape', () => {
+  it('mapeia o DTO snake_case para o formato de domínio', () => {
     expect(mapMovieListItem(dto)).toEqual({
       id: 1,
       title: 'Duna',
@@ -39,7 +39,7 @@ describe('mapMovieListItem', () => {
     })
   })
 
-  it('handles a missing release date and genre ids', () => {
+  it('lida com data de lançamento e genre ids ausentes', () => {
     const mapped = mapMovieListItem({
       ...dto,
       release_date: '',
@@ -52,7 +52,7 @@ describe('mapMovieListItem', () => {
 })
 
 describe('mapPaginated', () => {
-  it('caps totalPages at TMDB’s 500-page limit', () => {
+  it('limita totalPages ao teto de 500 páginas do TMDB', () => {
     const mapped = mapPaginated({
       page: 1,
       total_pages: 58817,
@@ -104,7 +104,7 @@ const detailsDto: TmdbMovieDetailsDto = {
 }
 
 describe('mapMovieDetails', () => {
-  it('derives genreIds from the full genre objects and maps extra fields', () => {
+  it('deriva genreIds dos objetos de gênero e mapeia os campos extras', () => {
     const mapped = mapMovieDetails(detailsDto)
     expect(mapped.genreIds).toEqual([878, 12])
     expect(mapped.tagline).toBe('A guerra pela especiaria.')
@@ -112,15 +112,15 @@ describe('mapMovieDetails', () => {
     expect(mapped.genres).toHaveLength(2)
   })
 
-  it('caps the cast at 12 members', () => {
+  it('limita o elenco a 12 pessoas', () => {
     expect(mapMovieDetails(detailsDto).cast).toHaveLength(12)
   })
 
-  it('prefers the official YouTube trailer', () => {
+  it('prioriza o trailer oficial do YouTube', () => {
     expect(mapMovieDetails(detailsDto).trailerKey).toBe('trailer-official')
   })
 
-  it('returns null trailer when there is no YouTube video', () => {
+  it('retorna trailer null quando não há vídeo do YouTube', () => {
     const mapped = mapMovieDetails({ ...detailsDto, videos: { results: [] } })
     expect(mapped.trailerKey).toBeNull()
   })

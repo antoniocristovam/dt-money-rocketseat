@@ -7,11 +7,11 @@ afterEach(() => {
 })
 
 describe('session-store', () => {
-  it('starts signed out', () => {
+  it('começa deslogado', () => {
     expect(getSession().isAuthenticated).toBe(false)
   })
 
-  it('signIn mints a token and stores the user', () => {
+  it('signIn gera um token e guarda o usuário', () => {
     useSessionStore.getState().signIn({ email: 'a@b.com', name: 'a' })
 
     const state = useSessionStore.getState()
@@ -20,14 +20,14 @@ describe('session-store', () => {
     expect(getSession().isAuthenticated).toBe(true)
   })
 
-  it('signOut clears the session', () => {
+  it('signOut limpa a sessão', () => {
     useSessionStore.getState().signIn({ email: 'a@b.com', name: 'a' })
     useSessionStore.getState().signOut()
 
     expect(getSession()).toEqual({ isAuthenticated: false, user: null })
   })
 
-  it('persists the session under the storage key', () => {
+  it('persiste a sessão na chave do storage', () => {
     useSessionStore.getState().signIn({ email: 'a@b.com', name: 'a' })
     expect(localStorage.getItem('cinedash:session')).toContain('a@b.com')
   })

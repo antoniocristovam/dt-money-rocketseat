@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { dashboardSearchSchema } from './search-schema'
 
-describe('dashboardSearchSchema', () => {
-  it('defaults page to 1 and leaves filters undefined', () => {
+describe('dashboardSearchSchema (filtros da URL)', () => {
+  it('assume page 1 e deixa os filtros indefinidos', () => {
     expect(dashboardSearchSchema.parse({})).toEqual({ page: 1 })
   })
 
-  it('keeps valid filters', () => {
+  it('mantém filtros válidos', () => {
     expect(
       dashboardSearchSchema.parse({
         page: 3,
@@ -19,7 +19,7 @@ describe('dashboardSearchSchema', () => {
     ).toEqual({ page: 3, q: 'matrix', genre: 28, year: 1999, minRating: 8 })
   })
 
-  it('falls back instead of throwing on garbage values', () => {
+  it('usa o fallback em vez de lançar erro com valores inválidos', () => {
     const parsed = dashboardSearchSchema.parse({
       page: -5,
       genre: 'abc',
@@ -32,7 +32,7 @@ describe('dashboardSearchSchema', () => {
     expect(parsed.minRating).toBeUndefined()
   })
 
-  it('drops an empty search string', () => {
+  it('descarta um texto de busca vazio', () => {
     expect(dashboardSearchSchema.parse({ q: '   ' }).q).toBeUndefined()
   })
 })

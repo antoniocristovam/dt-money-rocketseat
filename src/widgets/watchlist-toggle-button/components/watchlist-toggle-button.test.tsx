@@ -34,8 +34,8 @@ afterEach(() => {
   useWatchlistStore.setState({ items: [] })
 })
 
-describe('WatchlistToggleButton', () => {
-  it('adds and removes the movie, reflecting state on the button', async () => {
+describe('WatchlistToggleButton (botão de marcador)', () => {
+  it('adiciona e remove o filme, refletindo o estado no botão', async () => {
     const user = userEvent.setup()
     render(<WatchlistToggleButton movie={movie} />)
 

@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { getPaginationRange } from './pagination-range'
 
 describe('getPaginationRange', () => {
-  it('lists every page when they all fit', () => {
+  it('lista todas as páginas quando cabem', () => {
     expect(getPaginationRange({ page: 1, totalPages: 5 })).toEqual([
       1, 2, 3, 4, 5,
     ])
   })
 
-  it('shows a right ellipsis near the start', () => {
+  it('mostra reticências à direita perto do início', () => {
     expect(getPaginationRange({ page: 2, totalPages: 500 })).toEqual([
       1,
       2,
@@ -21,7 +21,7 @@ describe('getPaginationRange', () => {
     ])
   })
 
-  it('shows a left ellipsis near the end', () => {
+  it('mostra reticências à esquerda perto do fim', () => {
     expect(getPaginationRange({ page: 499, totalPages: 500 })).toEqual([
       1,
       'ellipsis',
@@ -33,7 +33,7 @@ describe('getPaginationRange', () => {
     ])
   })
 
-  it('shows both ellipses in the middle', () => {
+  it('mostra reticências dos dois lados no meio', () => {
     expect(getPaginationRange({ page: 250, totalPages: 500 })).toEqual([
       1,
       'ellipsis',

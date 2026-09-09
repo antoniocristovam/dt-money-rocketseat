@@ -48,8 +48,8 @@ afterEach(() => {
   useWatchlistStore.setState({ items: [] })
 })
 
-describe('MovieDetailsView', () => {
-  it('renders synopsis, meta, cast and trailer', () => {
+describe('MovieDetailsView (detalhes do filme)', () => {
+  it('renderiza sinopse, metadados, elenco e trailer', () => {
     render(<MovieDetailsView movie={movie} />)
 
     expect(
@@ -64,7 +64,7 @@ describe('MovieDetailsView', () => {
     )
   })
 
-  it('toggles the movie in the watchlist', async () => {
+  it('adiciona/remove o filme da watchlist', async () => {
     const user = userEvent.setup()
     render(<MovieDetailsView movie={movie} />)
 

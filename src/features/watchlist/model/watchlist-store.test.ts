@@ -23,7 +23,7 @@ afterEach(() => {
 })
 
 describe('watchlist-store', () => {
-  it('adds a movie as a trimmed snapshot', () => {
+  it('adiciona o filme como um snapshot enxuto', () => {
     useWatchlistStore.getState().add(movie)
 
     const [saved] = useWatchlistStore.getState().items
@@ -37,14 +37,14 @@ describe('watchlist-store', () => {
     expect(saved?.addedAt).toEqual(expect.any(Number))
   })
 
-  it('does not add the same movie twice', () => {
+  it('não adiciona o mesmo filme duas vezes', () => {
     const { add } = useWatchlistStore.getState()
     add(movie)
     add(movie)
     expect(useWatchlistStore.getState().items).toHaveLength(1)
   })
 
-  it('toggle adds then removes, returning the resulting state', () => {
+  it('toggle adiciona e depois remove, devolvendo o estado resultante', () => {
     const { toggle } = useWatchlistStore.getState()
     expect(toggle(movie)).toBe(true)
     expect(useWatchlistStore.getState().items).toHaveLength(1)
@@ -52,7 +52,7 @@ describe('watchlist-store', () => {
     expect(useWatchlistStore.getState().items).toHaveLength(0)
   })
 
-  it('persists to localStorage under the storage key', () => {
+  it('persiste no localStorage na chave do storage', () => {
     useWatchlistStore.getState().add(movie)
     expect(localStorage.getItem('cinedash:watchlist')).toContain('The Matrix')
   })

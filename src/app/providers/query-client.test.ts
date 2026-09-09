@@ -32,8 +32,8 @@ async function runFailingQuery(
   await Promise.resolve()
 }
 
-describe('createQueryClient error toast', () => {
-  it('toasts when a query fails', async () => {
+describe('toast de erro do createQueryClient', () => {
+  it('exibe um toast quando uma query falha', async () => {
     const error = new HttpError(503, 'Service Unavailable', {
       status_message: 'Servidor indisponível.',
     })
@@ -41,12 +41,12 @@ describe('createQueryClient error toast', () => {
     expect(fromError).toHaveBeenCalledWith(error)
   })
 
-  it('stays silent on a 404', async () => {
+  it('fica em silêncio em um 404', async () => {
     await runFailingQuery(new HttpError(404, 'Not Found', null))
     expect(fromError).not.toHaveBeenCalled()
   })
 
-  it('respects meta.skipErrorToast', async () => {
+  it('respeita meta.skipErrorToast', async () => {
     await runFailingQuery(new Error('boom'), { skipErrorToast: true })
     expect(fromError).not.toHaveBeenCalled()
   })

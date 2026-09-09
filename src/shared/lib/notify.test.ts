@@ -13,7 +13,7 @@ const toast = vi.hoisted(() => ({
 vi.mock('sonner', () => ({ toast }))
 
 describe('resolveErrorMessage', () => {
-  it('prefers the TMDB `status_message` from an HttpError payload', () => {
+  it('prioriza o status_message do TMDB no payload do HttpError', () => {
     const error = new HttpError(404, 'Not Found', {
       status_message: 'The resource you requested could not be found.',
     })
@@ -22,17 +22,17 @@ describe('resolveErrorMessage', () => {
     )
   })
 
-  it('falls back to the HttpError message when the payload has none', () => {
+  it('usa a mensagem do HttpError quando o payload não tem uma', () => {
     expect(resolveErrorMessage(new HttpError(500, 'Server Error', null))).toBe(
       'HTTP 500 Server Error',
     )
   })
 
-  it('uses a generic Error message', () => {
+  it('usa a mensagem de um Error genérico', () => {
     expect(resolveErrorMessage(new Error('boom'))).toBe('boom')
   })
 
-  it('uses the fallback for non-errors', () => {
+  it('usa o fallback para valores que não são Error', () => {
     expect(resolveErrorMessage('nope', 'Falha ao carregar')).toBe(
       'Falha ao carregar',
     )
@@ -40,12 +40,12 @@ describe('resolveErrorMessage', () => {
 })
 
 describe('notify', () => {
-  it('fromError toasts the resolved message', () => {
+  it('fromError exibe um toast com a mensagem resolvida', () => {
     notify.fromError(new Error('sem rede'))
     expect(toast.error).toHaveBeenCalledWith('sem rede')
   })
 
-  it('forwards the simple variants to sonner', () => {
+  it('encaminha as variantes simples pro sonner', () => {
     notify.success('ok')
     expect(toast.success).toHaveBeenCalledWith('ok')
   })

@@ -145,6 +145,8 @@ export default defineConfig([
       // Tests deliberately reject with arbitrary values and use throwaway query keys.
       '@typescript-eslint/prefer-promise-reject-errors': 'off',
       '@tanstack/query/exhaustive-deps': 'off',
+      // `vi.mocked(obj).method` intentionally grabs the method off its object.
+      '@typescript-eslint/unbound-method': 'off',
     },
   },
   {

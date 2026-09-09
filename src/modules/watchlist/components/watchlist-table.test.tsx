@@ -51,8 +51,8 @@ afterEach(() => {
   useWatchlistStore.setState({ items: [] })
 })
 
-describe('WatchlistTable', () => {
-  it('sorts by title when the header is clicked', async () => {
+describe('WatchlistTable (tabela da watchlist)', () => {
+  it('ordena por título ao clicar no cabeçalho', async () => {
     const user = userEvent.setup()
     render(<WatchlistTable rows={rows} />)
 
@@ -65,7 +65,7 @@ describe('WatchlistTable', () => {
     expect(rowTitles()).toEqual(['Zodiac', 'Alien'])
   })
 
-  it('sorts by genre', async () => {
+  it('ordena por gênero', async () => {
     const user = userEvent.setup()
     render(<WatchlistTable rows={rows} />)
 
@@ -73,7 +73,7 @@ describe('WatchlistTable', () => {
     expect(rowTitles()).toEqual(['Zodiac', 'Alien']) // Crime < Terror
   })
 
-  it('removes a movie from the store via the row action', async () => {
+  it('remove um filme do store pela ação da linha', async () => {
     const user = userEvent.setup()
     useWatchlistStore.setState({
       items: rows.map((row) => ({ ...row })),

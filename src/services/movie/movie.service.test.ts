@@ -35,7 +35,7 @@ beforeEach(() => {
 })
 
 describe('MovieService.getMovies', () => {
-  it('calls /discover/movie with mapped filter params when there is no text query', async () => {
+  it('chama /discover/movie com os filtros mapeados quando não há busca por texto', async () => {
     mockedHttp.mockResolvedValue(moviePage([]))
 
     await service.getMovies({ page: 2, genreId: 28, year: 1999, minRating: 8 })
@@ -51,7 +51,7 @@ describe('MovieService.getMovies', () => {
     })
   })
 
-  it('calls /search/movie when there is a text query', async () => {
+  it('chama /search/movie quando há busca por texto', async () => {
     mockedHttp.mockResolvedValue(moviePage([]))
 
     await service.getMovies({ page: 1, query: 'matrix' })
@@ -64,7 +64,7 @@ describe('MovieService.getMovies', () => {
     )
   })
 
-  it('applies genre and rating client-side to search results', async () => {
+  it('aplica gênero e nota no client-side nos resultados da busca', async () => {
     mockedHttp.mockResolvedValue(
       moviePage([
         { genre_ids: [28], vote_average: 9 },
@@ -86,7 +86,7 @@ describe('MovieService.getMovies', () => {
 })
 
 describe('MovieService.getMovieDetails', () => {
-  it('requests the movie with credits + videos appended and returns the domain model', async () => {
+  it('pede o filme com credits + videos e retorna o modelo de domínio', async () => {
     mockedHttp.mockResolvedValue({
       ...moviePage([{}]).results[0],
       title: 'Duna',
@@ -106,7 +106,7 @@ describe('MovieService.getMovieDetails', () => {
 })
 
 describe('MovieService.getGenres', () => {
-  it('unwraps the `genres` array from the TMDB payload', async () => {
+  it('desembrulha o array genres do payload do TMDB', async () => {
     mockedHttp.mockResolvedValue({ genres: [{ id: 1, name: 'Ação' }] })
 
     await expect(service.getGenres()).resolves.toEqual([

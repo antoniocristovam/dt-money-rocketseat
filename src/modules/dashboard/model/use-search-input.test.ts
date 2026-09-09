@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useSearchInput } from './use-search-input'
 
-describe('useSearchInput', () => {
+describe('useSearchInput (bind input ↔ URL com debounce)', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
 
-  it('commits the trimmed value after the debounce and reports pending state', () => {
+  it('propaga o valor sem espaços após o debounce e sinaliza o estado pendente', () => {
     const onCommit = vi.fn()
     const { result } = renderHook(() => useSearchInput(undefined, onCommit))
 
@@ -24,7 +24,7 @@ describe('useSearchInput', () => {
     expect(onCommit).toHaveBeenCalledWith('matrix')
   })
 
-  it('commits undefined when the field is cleared', () => {
+  it('propaga undefined quando o campo é limpo', () => {
     const onCommit = vi.fn()
     const { result } = renderHook(() => useSearchInput('matrix', onCommit))
 
@@ -38,7 +38,7 @@ describe('useSearchInput', () => {
     expect(onCommit).toHaveBeenCalledWith(undefined)
   })
 
-  it('syncs an external URL change back into the field without re-committing', () => {
+  it('sincroniza uma mudança externa da URL de volta pro campo sem re-propagar', () => {
     const onCommit = vi.fn()
     const { result, rerender } = renderHook<
       ReturnType<typeof useSearchInput>,

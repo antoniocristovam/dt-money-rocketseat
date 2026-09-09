@@ -16,8 +16,8 @@ afterEach(() => {
   document.documentElement.classList.remove('dark')
 })
 
-describe('ThemeToggle', () => {
-  it('switches to dark and applies the class to <html>', async () => {
+describe('ThemeToggle (alternador de tema)', () => {
+  it('muda para dark e aplica a classe no <html>', async () => {
     const user = userEvent.setup()
     render(<Harness />)
 
@@ -28,7 +28,7 @@ describe('ThemeToggle', () => {
     expect(document.documentElement).toHaveClass('dark')
   })
 
-  it('switches back to light and removes the class', async () => {
+  it('volta para light e remove a classe', async () => {
     const user = userEvent.setup()
     useThemeStore.setState({ theme: 'dark' })
     render(<Harness />)

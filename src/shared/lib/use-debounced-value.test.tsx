@@ -7,12 +7,12 @@ describe('useDebouncedValue', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
 
-  it('returns the initial value immediately', () => {
+  it('retorna o valor inicial imediatamente', () => {
     const { result } = renderHook(() => useDebouncedValue('a', 300))
     expect(result.current).toBe('a')
   })
 
-  it('only updates after the delay, collapsing rapid changes', () => {
+  it('só atualiza após o delay, colapsando mudanças rápidas', () => {
     const { result, rerender } = renderHook(
       ({ value }) => useDebouncedValue(value, 300),
       { initialProps: { value: 'a' } },
