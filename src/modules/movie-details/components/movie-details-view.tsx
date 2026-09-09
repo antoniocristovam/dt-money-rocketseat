@@ -1,7 +1,7 @@
-import { ImageIcon, StarIcon } from 'lucide-react'
-
 import type { MovieDetails } from '@/_core/models/responses/movie'
-import { backdropUrl, posterUrl } from '@/shared/lib/tmdb-image'
+import { RatingBadge } from '@/shared/components/rating-badge'
+import { TmdbImage } from '@/shared/components/tmdb-image'
+import { backdropUrl } from '@/shared/lib/tmdb-image'
 import { WatchlistToggleButton } from '@/widgets/watchlist-toggle-button'
 
 import { MovieCast } from './movie-cast'
@@ -15,7 +15,6 @@ function formatRuntime(minutes: number | null): string | null {
 }
 
 export function MovieDetailsView({ movie }: { movie: MovieDetails }) {
-  const poster = posterUrl(movie.posterPath, 'w342')
   const backdrop = backdropUrl(movie.backdropPath, 'w1280')
   const runtime = formatRuntime(movie.runtime)
 
@@ -36,19 +35,13 @@ export function MovieDetailsView({ movie }: { movie: MovieDetails }) {
           />
         ) : null}
         <div className="relative flex flex-col gap-6 p-6 sm:flex-row">
-          <div className="aspect-[2/3] w-32 shrink-0 overflow-hidden rounded-lg border bg-muted sm:w-44">
-            {poster ? (
-              <img
-                src={poster}
-                alt={`Pôster de ${movie.title}`}
-                className="size-full object-cover"
-              />
-            ) : (
-              <div className="flex size-full items-center justify-center text-muted-foreground">
-                <ImageIcon className="size-8" />
-              </div>
-            )}
-          </div>
+          <TmdbImage
+            path={movie.posterPath}
+            size="w342"
+            alt={`Pôster de ${movie.title}`}
+            loading="eager"
+            className="aspect-[2/3] w-32 shrink-0 rounded-lg border sm:w-44"
+          />
 
           <div className="flex flex-col gap-3">
             <div className="space-y-1">
@@ -62,8 +55,7 @@ export function MovieDetailsView({ movie }: { movie: MovieDetails }) {
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               <span className="flex items-center gap-1 font-medium text-foreground">
-                <StarIcon className="size-4 fill-amber-400 text-amber-400" />
-                {movie.rating.toFixed(1)}
+                <RatingBadge value={movie.rating} iconClassName="size-4" />
                 <span className="font-normal text-muted-foreground">
                   ({movie.voteCount.toLocaleString('pt-BR')})
                 </span>

@@ -1,7 +1,7 @@
 import { FilmIcon, TriangleAlertIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
 
 import type { Genre, MovieListItem } from '@/_core/models/responses/movie'
+import { EmptyState } from '@/shared/components/empty-state'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
 
@@ -42,7 +42,7 @@ export function MovieGrid({
   if (isError) {
     return (
       <EmptyState
-        icon={<TriangleAlertIcon className="size-8" />}
+        icon={<TriangleAlertIcon />}
         title="Não foi possível carregar os filmes"
         description="Verifique sua conexão e tente novamente."
         action={<Button onClick={onRetry}>Tentar novamente</Button>}
@@ -53,7 +53,7 @@ export function MovieGrid({
   if (movies.length === 0) {
     return (
       <EmptyState
-        icon={<FilmIcon className="size-8" />}
+        icon={<FilmIcon />}
         title="Nenhum filme encontrado"
         description="Ajuste os filtros ou o termo de busca."
       />
@@ -65,29 +65,6 @@ export function MovieGrid({
       {movies.map((movie) => (
         <MovieCard key={movie.id} movie={movie} genres={genres} />
       ))}
-    </div>
-  )
-}
-
-function EmptyState({
-  icon,
-  title,
-  description,
-  action,
-}: {
-  icon: ReactNode
-  title: string
-  description: string
-  action?: ReactNode
-}) {
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
-      <div className="text-muted-foreground">{icon}</div>
-      <div className="space-y-1">
-        <p className="font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-      {action}
     </div>
   )
 }

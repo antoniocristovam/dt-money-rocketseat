@@ -27,7 +27,9 @@ src/
   widgets/    # blocos de UI reutilizáveis entre módulos (app-layout, watchlist-toggle-button)
   features/   # SÓ lógica transversal — model/ e hooks/, sem UI (auth, theme, watchlist, genres)
   services/   # 1 classe por domínio que fala com a API (movie/movie.service.ts)
-  shared/     # infra agnóstica: http client, config, libs, UI kit
+  shared/     # infra agnóstica: cliente axios, config, libs, UI kit (ui/) e
+              # componentes de domínio reutilizáveis (components/: DataTable,
+              # EmptyState, RatingBadge, TmdbImage)
   _core/      # domínio puro, sem dependências: params, responses, dtos, mappers, helpers
 ```
 
@@ -108,6 +110,9 @@ mora em `features/auth`; `_authenticated/route.tsx` só a consome no `beforeLoad
 ### Separação UI / Lógica / Dados
 
 - **UI** (`components/`): recebe dados por props, dispara callbacks. Sem `fetch`, sem store.
+  O que se repete em mais de um módulo sobe para `shared/components/` (`DataTable`
+  sobre o TanStack Table, `EmptyState`, `RatingBadge`, `TmdbImage`); o kit shadcn
+  cru fica em `shared/ui/`.
 - **Lógica** (`model/` + `hooks/`): hooks e stores — debounce, seleção de tema,
   filtros da URL, e os hooks de dados (`use-movies`, `use-movie-details`, `use-genres`).
 - **Dados**: `shared/api/tmdb-client.ts` (instância axios) → `services/movie` (casos
@@ -217,9 +222,12 @@ useSearchInput (debounce 400ms no write) ◀── SearchInput          ▼
   `<Link>`) e os detalhes do filme consomem o mesmo componente.
 - **`modules/watchlist`** — a `WatchlistPage` resolve os nomes de gênero
   (`useGenres`) e passa as linhas já prontas para `WatchlistTable`; a tabela
-  não faz data-fetching. **TanStack Table** (`@tanstack/react-table` v8):
-  `getSortedRowModel`, colunas ordenáveis por Título, Gênero e Lançamento
-  (cabeçalho clicável). Remover linha e "Limpar lista" agem no store.
+  não faz data-fetching. `WatchlistTable` só monta as colunas
+  (`watchlist-columns.tsx`) e delega a renderização/ordenação ao
+  **`shared/components/data-table`** — o *wiring* do **TanStack Table**
+  (`@tanstack/react-table` v8: `getSortedRowModel`, cabeçalho clicável) fica
+  genérico ali, sem nada de watchlist. Colunas ordenáveis por Título, Gênero e
+  Lançamento. Remover linha e "Limpar lista" agem no store.
 - Contador no header (`useWatchlistCount`) e link ativo via `<Link activeProps>`.
 
 ## Detalhes do filme (`modules/movie-details`)

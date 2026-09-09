@@ -1,14 +1,14 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { NotFound } from '@/shared/components/notFoundPage'
+import { NotFoundPage } from '@/modules/not-found/pages/not-found'
 import { AppLayout } from '@/widgets/app-layout'
 
 export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: () => (
     <AppLayout>
-      <NotFound />
+      <NotFoundPage />
     </AppLayout>
   ),
 })

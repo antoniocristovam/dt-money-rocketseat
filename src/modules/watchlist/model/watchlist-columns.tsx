@@ -1,9 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
-import { StarIcon, Trash2Icon } from 'lucide-react'
+import { Trash2Icon } from 'lucide-react'
 
 import type { WatchlistMovie } from '@/features/watchlist'
-import { posterUrl } from '@/shared/lib/tmdb-image'
+import { RatingBadge } from '@/shared/components/rating-badge'
+import { TmdbImage } from '@/shared/components/tmdb-image'
 import { Button } from '@/shared/ui/button'
 
 export type WatchlistRow = WatchlistMovie & { genre: string }
@@ -28,22 +29,19 @@ export function createWatchlistColumns(
       sortingFn: 'text',
       cell: ({ row }) => {
         const movie = row.original
-        const poster = posterUrl(movie.posterPath, 'w154')
         return (
           <Link
             to="/movie/$movieId"
             params={{ movieId: String(movie.id) }}
             className="flex items-center gap-3 font-medium hover:text-primary"
           >
-            {poster ? (
-              <img
-                src={poster}
-                alt=""
-                className="h-14 w-10 shrink-0 rounded object-cover"
-              />
-            ) : (
-              <div className="h-14 w-10 shrink-0 rounded bg-muted" />
-            )}
+            <TmdbImage
+              path={movie.posterPath}
+              size="w154"
+              alt=""
+              fallback={null}
+              className="h-14 w-10 shrink-0 rounded"
+            />
             <span className="line-clamp-2">{movie.title}</span>
           </Link>
         )
@@ -72,10 +70,7 @@ export function createWatchlistColumns(
       header: 'Nota',
       enableSorting: false,
       cell: ({ getValue }) => (
-        <span className="flex items-center gap-1 tabular-nums">
-          <StarIcon className="size-3.5 fill-amber-400 text-amber-400" />
-          {getValue().toFixed(1)}
-        </span>
+        <RatingBadge value={getValue()} className="tabular-nums" />
       ),
     }),
     columnHelper.display({

@@ -1,15 +1,14 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowLeftIcon, TriangleAlertIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
 
 import { HttpError } from '@/shared/api/http-error'
+import { EmptyState } from '@/shared/components/empty-state'
 import { Button } from '@/shared/ui/button'
 
 import { MovieDetailsSkeleton } from '../components/movie-details-skeleton'
 import { MovieDetailsView } from '../components/movie-details-view'
 import { useMovieDetails } from '../hooks/use-movie-details'
 
-// interface
 interface MovieDetailsPageProps {
   movieId: string
 }
@@ -34,6 +33,7 @@ export const MovieDetailsPage = ({ movieId }: MovieDetailsPageProps) => {
 
       {notFound ? (
         <EmptyState
+          icon={<TriangleAlertIcon />}
           title="Filme não encontrado"
           description="O identificador informado não corresponde a nenhum filme."
         />
@@ -41,6 +41,7 @@ export const MovieDetailsPage = ({ movieId }: MovieDetailsPageProps) => {
         <MovieDetailsSkeleton />
       ) : query.isError ? (
         <EmptyState
+          icon={<TriangleAlertIcon />}
           title="Não foi possível carregar o filme"
           description="Tente novamente em instantes."
           action={
@@ -52,27 +53,6 @@ export const MovieDetailsPage = ({ movieId }: MovieDetailsPageProps) => {
       ) : query.data ? (
         <MovieDetailsView movie={query.data} />
       ) : null}
-    </div>
-  )
-}
-
-function EmptyState({
-  title,
-  description,
-  action,
-}: {
-  title: string
-  description: string
-  action?: ReactNode
-}) {
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
-      <TriangleAlertIcon className="size-8 text-muted-foreground" />
-      <div className="space-y-1">
-        <p className="font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-      {action}
     </div>
   )
 }
