@@ -5,9 +5,9 @@ import type {
   TmdbMovieDetailsDto,
 } from '@/_core/models/dtos/movie'
 import type {
+  Paginated,
   MovieDetails,
   MovieListItem,
-  Paginated,
 } from '@/_core/models/responses/movie'
 
 function parseYear(releaseDate: string): number | null {
