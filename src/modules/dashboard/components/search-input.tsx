@@ -16,8 +16,6 @@ export function SearchInput({ isFetching = false }: { isFetching?: boolean }) {
   )
   const { text, setText, isDebouncing } = useSearchInput(filters.q, commit)
 
-  // Spin while the user is typing, or while a request tied to an active search
-  // is in flight. A plain first page load (no query) is handled by the grid.
   const isBusy = isDebouncing || (isFetching && filters.q !== undefined)
 
   return (

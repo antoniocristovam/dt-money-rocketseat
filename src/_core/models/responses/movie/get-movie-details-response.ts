@@ -16,5 +16,4 @@ export interface MovieDetails extends MovieListItem {
   trailerKey: string | null
 }
 
-/** `GET /movie/{id}?append_to_response=credits,videos` */
 export type GetMovieDetailsResponse = MovieDetails

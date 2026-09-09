@@ -11,11 +11,11 @@ const GRID =
   'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
 
 interface MovieGridProps {
-  movies: MovieListItem[]
   genres: Genre[]
-  isLoading: boolean
   isError: boolean
+  isLoading: boolean
   onRetry: () => void
+  movies: MovieListItem[]
 }
 
 export function MovieGrid({

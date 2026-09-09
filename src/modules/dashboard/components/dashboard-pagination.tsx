@@ -12,8 +12,8 @@ interface DashboardPaginationProps {
 }
 
 export function DashboardPagination({
-  totalPages,
   disabled,
+  totalPages,
 }: DashboardPaginationProps) {
   const { filters, setFilters } = useDashboardFilters()
   const page = filters.page
