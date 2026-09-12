@@ -9,8 +9,8 @@ export function MovieTrailer({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Trailer</h2>
-      <div className="aspect-video overflow-hidden rounded-lg border bg-black">
+      <h2 className="text-lg font-semibold tracking-tight">Trailer</h2>
+      <div className="aspect-video overflow-hidden rounded-xl border bg-black">
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${trailerKey}`}
           title={`Trailer de ${title}`}

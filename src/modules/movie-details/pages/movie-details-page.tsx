@@ -24,7 +24,12 @@ export const MovieDetailsPage = ({ movieId }: MovieDetailsPageProps) => {
 
   return (
     <div className="space-y-6">
-      <Button asChild variant="ghost" size="sm">
+      <Button
+        asChild
+        variant="ghost"
+        size="sm"
+        className="-ml-2 text-muted-foreground"
+      >
         <Link to="/">
           <ArrowLeftIcon className="size-4" />
           Voltar para a descoberta
