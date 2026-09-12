@@ -8,16 +8,17 @@ export function MovieCast({ cast }: { cast: CastMember[] }) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Elenco</h2>
-      <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      <h2 className="text-lg font-semibold tracking-tight">Elenco</h2>
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {cast.map((member) => (
-          <li key={member.id} className="space-y-1.5">
+          <li key={member.id} className="group space-y-1.5">
             <TmdbImage
               path={member.profilePath}
               size="w185"
               alt={member.name}
               fallback={<UserRoundIcon className="size-6" />}
-              className="aspect-[2/3] rounded-md"
+              className="aspect-[2/3] rounded-lg border"
+              imgClassName="transition-transform duration-300 group-hover:scale-105"
             />
             <p className="text-sm font-medium leading-tight">{member.name}</p>
             {member.character ? (

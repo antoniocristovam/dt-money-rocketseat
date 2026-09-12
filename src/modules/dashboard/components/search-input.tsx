@@ -19,7 +19,7 @@ export function SearchInput({ isFetching = false }: { isFetching?: boolean }) {
   const isBusy = isDebouncing || (isFetching && filters.q !== undefined)
 
   return (
-    <div className="relative w-full sm:max-w-xs">
+    <div className="relative w-full sm:max-w-sm">
       <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         type="search"
@@ -27,7 +27,7 @@ export function SearchInput({ isFetching = false }: { isFetching?: boolean }) {
         onChange={(event) => setText(event.target.value)}
         placeholder="Buscar filmes…"
         aria-label="Buscar filmes"
-        className={cn('pl-9', isBusy && 'pr-9')}
+        className={cn('bg-background pl-9', isBusy && 'pr-9')}
       />
       <Loader2Icon
         aria-hidden={!isBusy}

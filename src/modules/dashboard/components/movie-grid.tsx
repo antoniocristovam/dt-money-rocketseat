@@ -8,7 +8,7 @@ import { Skeleton } from '@/shared/ui/skeleton'
 import { MovieCard } from './movie-card'
 
 const GRID =
-  'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+  'grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
 
 interface MovieGridProps {
   genres: Genre[]
@@ -30,7 +30,7 @@ export function MovieGrid({
       <div className={GRID} aria-busy="true" aria-label="Carregando filmes">
         {Array.from({ length: 10 }, (_, index) => (
           <div key={index} className="space-y-2">
-            <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+            <Skeleton className="aspect-[2/3] w-full rounded-xl" />
             <Skeleton className="h-4 w-3/4" />
             <Skeleton className="h-3 w-1/2" />
           </div>

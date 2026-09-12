@@ -49,23 +49,24 @@ export const DashboardPage = () => {
 
   return (
     <section className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Descoberta</h1>
-        <p className="text-muted-foreground">
-          Explore o catálogo do TMDB para montar a curadoria do streaming.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Descoberta</h1>
+          <p className="text-sm text-muted-foreground">
+            Explore o catálogo do TMDB para montar a curadoria do streaming.
+          </p>
+        </div>
+        {page && !moviesQuery.isError ? (
+          <p className="shrink-0 text-sm text-muted-foreground tabular-nums">
+            {page.totalResults.toLocaleString('pt-BR')} filmes encontrados
+          </p>
+        ) : null}
       </header>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between">
         <SearchInput isFetching={moviesQuery.isFetching} />
         <MovieFilters />
       </div>
-
-      {page && !moviesQuery.isError ? (
-        <p className="text-sm text-muted-foreground">
-          {page.totalResults.toLocaleString('pt-BR')} filmes encontrados
-        </p>
-      ) : null}
 
       <div
         className={cn(
