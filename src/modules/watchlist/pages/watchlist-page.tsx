@@ -26,10 +26,10 @@ export const WatchlistPage = () => {
 
   return (
     <section className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
+      <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">Minha lista</h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {movies.length === 0
               ? 'Nenhum filme salvo ainda.'
               : `${movies.length.toLocaleString('pt-BR')} ${
@@ -56,7 +56,9 @@ export const WatchlistPage = () => {
           }
         />
       ) : (
-        <WatchlistTable rows={rows} />
+        <div className="overflow-hidden rounded-xl border bg-card">
+          <WatchlistTable rows={rows} />
+        </div>
       )}
     </section>
   )

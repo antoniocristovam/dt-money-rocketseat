@@ -33,14 +33,14 @@ export function createWatchlistColumns(
           <Link
             to="/movie/$movieId"
             params={{ movieId: String(movie.id) }}
-            className="flex items-center gap-3 font-medium hover:text-primary"
+            className="flex items-center gap-3 font-medium transition-colors hover:text-primary"
           >
             <TmdbImage
               path={movie.posterPath}
               size="w154"
               alt=""
               fallback={null}
-              className="h-14 w-10 shrink-0 rounded"
+              className="h-16 w-11 shrink-0 rounded-md border"
             />
             <span className="line-clamp-2">{movie.title}</span>
           </Link>

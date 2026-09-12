@@ -68,7 +68,7 @@ export function DataTable<TData>({
                       type="button"
                       onClick={header.column.getToggleSortingHandler()}
                       className={cn(
-                        'flex items-center gap-1 hover:text-foreground',
+                        'flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-foreground',
                         direction && 'text-foreground',
                       )}
                     >
@@ -76,7 +76,7 @@ export function DataTable<TData>({
                         header.column.columnDef.header,
                         header.getContext(),
                       )}
-                      <Icon className="size-3.5" />
+                      <Icon className="size-3" />
                     </button>
                   ) : (
                     flexRender(

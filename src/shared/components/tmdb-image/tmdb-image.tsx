@@ -14,6 +14,8 @@ interface TmdbImageProps {
    */
   fallback?: ReactNode
   className?: string
+  /** Extra classes on the `<img>` itself (e.g. a hover zoom). */
+  imgClassName?: string
   loading?: 'lazy' | 'eager'
   /** Overlays positioned against the image box (badges, buttons…). */
   children?: ReactNode
@@ -28,6 +30,7 @@ export function TmdbImage({
   alt,
   fallback = DEFAULT_FALLBACK,
   className,
+  imgClassName,
   loading = 'lazy',
   children,
 }: TmdbImageProps) {
@@ -40,7 +43,7 @@ export function TmdbImage({
           src={src}
           alt={alt}
           loading={loading}
-          className="size-full object-cover"
+          className={cn('size-full object-cover', imgClassName)}
         />
       ) : fallback ? (
         <div className="flex size-full items-center justify-center text-muted-foreground">
